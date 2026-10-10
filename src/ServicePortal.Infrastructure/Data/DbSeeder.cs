@@ -8,6 +8,8 @@ namespace ServicePortal.Infrastructure.Data;
 
 public static class DbSeeder
 {
+    public const string DefaultPassword = "Pass@123";
+
     public static async Task SeedAsync(
         ApplicationDbContext context,
         UserManager<ApplicationUser> userManager,
@@ -73,7 +75,6 @@ public static class DbSeeder
         }
 
         // 5. Seed Users
-        const string defaultPassword = "Pass@123";
 
         // Admin
         var admin = await EnsureUserAsync(userManager, "admin@contoso.com", "Admin User", "IT Operations", true, true, null);
@@ -311,7 +312,7 @@ public static class DbSeeder
                 SupportTeamId = supportTeamId,
                 CreatedAt = DateTime.UtcNow
             };
-            var result = await userManager.CreateAsync(user, defaultPassword);
+            var result = await userManager.CreateAsync(user, DefaultPassword);
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException($"Failed to seed user {email}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
