@@ -59,8 +59,8 @@ public class ServiceRequest
     [MaxLength(2000)]
     public string? CorrectionNotes { get; set; }
 
-    [Timestamp]
-    public byte[] RowVersion { get; set; } = [];
+    [ConcurrencyCheck]
+    public byte[] RowVersion { get; set; } = Guid.NewGuid().ToByteArray();
 
     public ICollection<RequestComment> Comments { get; set; } = new List<RequestComment>();
     public ICollection<RequestAttachment> Attachments { get; set; } = new List<RequestAttachment>();

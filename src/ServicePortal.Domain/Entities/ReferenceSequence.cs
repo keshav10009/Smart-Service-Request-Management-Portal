@@ -9,6 +9,6 @@ public class ReferenceSequence
 
     public int LastNumber { get; set; }
 
-    [Timestamp]
-    public byte[] RowVersion { get; set; } = [];
+    [ConcurrencyCheck]
+    public byte[] RowVersion { get; set; } = Guid.NewGuid().ToByteArray();
 }

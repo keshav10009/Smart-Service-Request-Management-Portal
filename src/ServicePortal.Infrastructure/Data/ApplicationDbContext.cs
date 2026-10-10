@@ -70,7 +70,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
             // Optimistic concurrency token
             b.Property(r => r.RowVersion)
-                .IsRowVersion()
                 .IsConcurrencyToken();
 
             // Indexes for fast searching, filtering, and SLA checks
@@ -207,7 +206,38 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<ReferenceSequence>(b =>
         {
             b.HasKey(s => s.Year);
-            b.Property(s => s.RowVersion).IsRowVersion().IsConcurrencyToken();
+            b.Property(s => s.RowVersion).IsConcurrencyToken();
         });
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateConcurrencyTokens();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override int SaveChanges()
+    {
+        UpdateConcurrencyTokens();
+        return base.SaveChanges();
+    }
+
+    private void UpdateConcurrencyTokens()
+    {
+        foreach (var entry in ChangeTracker.Entries<ServiceRequest>())
+        {
+            if (entry.State == EntityState.Added || entry.State == EntityState.Modified)
+            {
+                entry.Entity.RowVersion = Guid.NewGuid().ToByteArray();
+            }
+        }
+
+        foreach (var entry in ChangeTracker.Entries<ReferenceSequence>())
+        {
+            if (entry.State == EntityState.Added || entry.State == EntityState.Modified)
+            {
+                entry.Entity.RowVersion = Guid.NewGuid().ToByteArray();
+            }
+        }
     }
 }
