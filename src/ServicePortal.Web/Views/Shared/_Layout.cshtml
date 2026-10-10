@@ -9,52 +9,69 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var currentEmail = User.Identity?.Name ?? "";
+    }
     <!-- Interactive Demo Switcher Bar for Reviewers & Evaluators -->
     <div class="demo-bar d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-primary text-white"><i class="bi bi-person-badge"></i> Quick Persona Switcher:</span>
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <span class="demo-badge-title"><i class="bi bi-people-fill"></i> Switch Persona:</span>
             <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="email" value="admin@contoso.com" />
-                <button type="submit" class="btn btn-sm btn-outline-light btn-demo">Admin</button>
+                <button type="submit" class="btn btn-demo @(currentEmail == "admin@contoso.com" ? "active" : "")">
+                    <i class="bi bi-shield-shaded"></i> Admin
+                </button>
             </form>
             <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="email" value="lead.it@contoso.com" />
-                <button type="submit" class="btn btn-sm btn-outline-light btn-demo">IT Lead</button>
+                <button type="submit" class="btn btn-demo @(currentEmail == "lead.it@contoso.com" ? "active" : "")">
+                    <i class="bi bi-laptop"></i> IT Lead
+                </button>
             </form>
             <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="email" value="lead.hr@contoso.com" />
-                <button type="submit" class="btn btn-sm btn-outline-light btn-demo">HR Lead</button>
+                <button type="submit" class="btn btn-demo @(currentEmail == "lead.hr@contoso.com" ? "active" : "")">
+                    <i class="bi bi-person-badge"></i> HR Lead
+                </button>
             </form>
             <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="email" value="agent.john@contoso.com" />
-                <button type="submit" class="btn btn-sm btn-outline-light btn-demo">Agent John (IT)</button>
+                <button type="submit" class="btn btn-demo @(currentEmail == "agent.john@contoso.com" ? "active" : "")">
+                    <i class="bi bi-headset"></i> Agent John (IT)
+                </button>
             </form>
             <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="email" value="agent.sarah@contoso.com" />
-                <button type="submit" class="btn btn-sm btn-outline-light btn-demo">Agent Sarah (Fac)</button>
+                <button type="submit" class="btn btn-demo @(currentEmail == "agent.sarah@contoso.com" ? "active" : "")">
+                    <i class="bi bi-tools"></i> Agent Sarah (Fac)
+                </button>
             </form>
             <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="email" value="requester1@contoso.com" />
-                <button type="submit" class="btn btn-sm btn-outline-light btn-demo">Requester (Alice)</button>
+                <button type="submit" class="btn btn-demo @(currentEmail == "requester1@contoso.com" ? "active" : "")">
+                    <i class="bi bi-person-fill"></i> Requester (Alice)
+                </button>
             </form>
             <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="email" value="unverified@contoso.com" />
-                <button type="submit" class="btn btn-sm btn-outline-warning btn-demo">Requester (Unverified)</button>
+                <button type="submit" class="btn btn-demo @(currentEmail == "unverified@contoso.com" ? "active border-warning" : "border-warning")">
+                    <i class="bi bi-shield-exclamation text-warning"></i> Requester (Unverified)
+                </button>
             </form>
         </div>
         <div class="text-light opacity-75 small d-none d-md-block">
-            <i class="bi bi-clock-history"></i> SLA Business Hours: Mon-Fri 09:00 - 18:00
+            <i class="bi bi-clock-history text-info me-1"></i> SLA Hours: Mon-Fri 09:00 - 18:00
         </div>
     </div>
 
@@ -66,65 +83,70 @@
                     <span class="navbar-brand-badge">
                         <i class="bi bi-shield-check"></i> SSRMP
                     </span>
-                    <span class="fw-bold text-dark">Contoso Support Services</span>
+                    <span class="fw-bold text-dark fs-5">Contoso Support Services</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarMain">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1 ms-lg-3">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+                                <a class="nav-link" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-grid-1x2-fill text-primary"></i> Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="ServiceRequest" asp-action="Index"><i class="bi bi-card-checklist"></i> Service Requests</a>
+                                <a class="nav-link" asp-controller="ServiceRequest" asp-action="Index"><i class="bi bi-card-checklist text-indigo"></i> Service Requests</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="ServiceRequest" asp-action="Create"><i class="bi bi-plus-circle"></i> Submit Request</a>
+                                <a class="nav-link" asp-controller="ServiceRequest" asp-action="Create"><i class="bi bi-plus-circle-fill text-success"></i> Submit Request</a>
                             </li>
                             @if (User.IsInRole(AppRoles.Administrator))
                             {
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-gear"></i> Administration
+                                        <i class="bi bi-gear-fill text-secondary"></i> Administration
                                     </a>
-                                    <ul class="dropdown-menu border-0 shadow-sm">
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Users"><i class="bi bi-people"></i> User Management</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Teams"><i class="bi bi-diagram-3"></i> Support Teams</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Categories"><i class="bi bi-tags"></i> Request Categories</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="SlaPolicies"><i class="bi bi-stopwatch"></i> SLA Policies</a></li>
+                                    <ul class="dropdown-menu border-0 shadow-lg">
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Users"><i class="bi bi-people me-2"></i> User Management</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Teams"><i class="bi bi-diagram-3 me-2"></i> Support Teams</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Categories"><i class="bi bi-tags me-2"></i> Request Categories</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="SlaPolicies"><i class="bi bi-stopwatch me-2"></i> SLA Policies</a></li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="AuditLogs"><i class="bi bi-journal-text"></i> Audit Logs</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="AuditLogs"><i class="bi bi-journal-text me-2"></i> Audit Logs</a></li>
                                     </ul>
                                 </li>
                             }
                         }
                     </ul>
-                    <ul class="navbar-nav ms-auto align-items-center gap-2">
+                    <ul class="navbar-nav ms-auto align-items-center gap-3">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link position-relative px-2" asp-controller="Notifications" asp-action="Index" title="Notifications">
-                                    <i class="bi bi-bell fs-5"></i>
-                                    <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                                <a class="nav-link position-relative p-2" asp-controller="Notifications" asp-action="Index" title="Notifications">
+                                    <i class="bi bi-bell-fill fs-5 text-secondary"></i>
+                                    <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none shadow-sm">
                                         0
                                     </span>
                                 </a>
                             </li>
-                            <li class="nav-item border-start ps-2 d-flex align-items-center gap-2">
-                                <div class="text-end">
-                                    <div class="fw-semibold small text-dark">@User.Identity?.Name</div>
-                                    <div class="text-muted" style="font-size: 0.72rem;">
-                                        @(User.IsInRole(AppRoles.Administrator) ? "Administrator" :
-                                          User.IsInRole(AppRoles.TeamLead) ? "Team Lead" :
-                                          User.IsInRole(AppRoles.SupportAgent) ? "Support Agent" : "Requester")
+                            <li class="nav-item d-flex align-items-center gap-2">
+                                <div class="user-profile-pill">
+                                    <div class="user-avatar-circle">
+                                        @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "U")
+                                    </div>
+                                    <div class="text-start pe-1">
+                                        <div class="fw-bold small text-dark lh-sm">@User.Identity?.Name</div>
+                                        <div class="text-muted lh-1" style="font-size: 0.72rem;">
+                                            @(User.IsInRole(AppRoles.Administrator) ? "Administrator" :
+                                              User.IsInRole(AppRoles.TeamLead) ? "Team Lead" :
+                                              User.IsInRole(AppRoles.SupportAgent) ? "Support Agent" : "Requester")
+                                        </div>
                                     </div>
                                 </div>
                                 <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Sign Out"><i class="bi bi-box-arrow-right"></i></button>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Sign Out" style="border-radius: 8px;"><i class="bi bi-box-arrow-right"></i></button>
                                 </form>
                             </li>
                         }

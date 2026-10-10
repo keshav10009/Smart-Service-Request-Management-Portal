@@ -3,42 +3,74 @@
     ViewData["Title"] = "Requester Dashboard";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
-        <h2 class="fw-bold mb-1">My Service Requests</h2>
-        <p class="text-muted small mb-0">Track and manage your submitted support and IT requests</p>
+        <h2 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">My Service Requests</h2>
+        <p class="text-muted small mb-0">Track live progress, provide feedback, and manage your support tickets</p>
     </div>
     <div>
         <a asp-controller="ServiceRequest" asp-action="Create" class="btn btn-primary px-3 shadow-sm">
-            <i class="bi bi-plus-lg"></i> Submit New Request
+            <i class="bi bi-plus-lg me-1"></i> Submit New Request
         </a>
     </div>
 </div>
 
 <!-- Stat KPI Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-primary border-4">
-            <div class="stat-value text-primary">@Model.OpenRequestsCount</div>
-            <div class="stat-label">Active / Open</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Active / Open</span>
+                    <div class="kpi-value text-primary">@Model.OpenRequestsCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-arrow-clockwise"></i> In active support</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-primary">
+                    <i class="bi bi-folder2-open"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-warning border-4">
-            <div class="stat-value text-warning">@Model.WaitingForRequesterCount</div>
-            <div class="stat-label">Waiting for Your Input</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Action Needed</span>
+                    <div class="kpi-value text-warning">@Model.WaitingForRequesterCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-chat-dots-fill text-warning"></i> Waiting on your reply</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-warning">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-success border-4">
-            <div class="stat-value text-success">@Model.ResolvedRequestsCount</div>
-            <div class="stat-label">Resolved</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Resolved</span>
+                    <div class="kpi-value text-success">@Model.ResolvedRequestsCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-check-circle-fill text-success"></i> Solved & ready</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-success">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-secondary border-4">
-            <div class="stat-value text-muted">@Model.ClosedRequestsCount</div>
-            <div class="stat-label">Closed</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-secondary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Closed</span>
+                    <div class="kpi-value text-secondary">@Model.ClosedRequestsCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-archive-fill"></i> Completed history</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-secondary">
+                    <i class="bi bi-archive-fill"></i>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -46,93 +78,113 @@
 <!-- Recent Requests List -->
 <div class="card portal-card border-0 mb-4">
     <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
-        <span class="fw-bold"><i class="bi bi-clock-history me-2"></i> Recent Activity</span>
-        <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-sm btn-outline-primary">View All Requests</a>
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-clock-history text-primary fs-5"></i>
+            <span class="fw-bold text-dark">Recent Activity</span>
+            @if (Model.RecentRequests.Count > 0)
+            {
+                <span class="badge bg-light text-muted border ms-1">@Model.RecentRequests.Count items</span>
+            }
+        </div>
+        <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-arrow-right-short"></i> View All Requests
+        </a>
     </div>
     <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-portal table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th>Reference</th>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Priority</th>
-                        <th>Status</th>
-                        <th>SLA Deadline</th>
-                        <th>Submitted</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.RecentRequests.Count == 0)
-                    {
+        @if (Model.RecentRequests.Count == 0)
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="bi bi-inbox-fill"></i>
+                </div>
+                <h5 class="empty-state-title">No Service Requests Logged Yet</h5>
+                <p class="empty-state-desc">
+                    Need assistance with hardware, software access, VPN, or office facilities? Submit your first request and our team will get right on it.
+                </p>
+                <a asp-controller="ServiceRequest" asp-action="Create" class="btn btn-primary px-4 shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Submit New Request
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-portal table-hover mb-0">
+                    <thead>
                         <tr>
-                            <td colspan="8" class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                You haven't submitted any service requests yet.
-                            </td>
+                            <th>Reference</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>SLA Target</th>
+                            <th>Submitted</th>
+                            <th class="text-end">Actions</th>
                         </tr>
-                    }
-                    @foreach (var item in Model.RecentRequests)
-                    {
-                        <tr>
-                            <td>
-                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-decoration-none text-primary">
-                                    @item.ReferenceNumber
-                                </a>
-                            </td>
-                            <td>
-                                <span class="fw-medium text-dark">@item.Title</span>
-                            </td>
-                            <td><span class="badge bg-light text-dark border">@item.CategoryName</span></td>
-                            <td>
-                                @if (item.Priority == RequestPriority.Critical)
-                                {
-                                    <span class="badge bg-danger">Critical</span>
-                                }
-                                else if (item.Priority == RequestPriority.High)
-                                {
-                                    <span class="badge bg-warning text-dark">High</span>
-                                }
-                                else if (item.Priority == RequestPriority.Medium)
-                                {
-                                    <span class="badge bg-info text-dark">Medium</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Low</span>
-                                }
-                            </td>
-                            <td>
-                                <span class="badge-status badge-status-@item.Status.ToString().ToLower()">
-                                    @item.Status
-                                </span>
-                            </td>
-                            <td>
-                                @if (item.SlaHealth == SlaHealthStatus.Breached)
-                                {
-                                    <span class="badge badge-sla-breached"><i class="bi bi-exclamation-octagon-fill"></i> Breached</span>
-                                }
-                                else if (item.SlaHealth == SlaHealthStatus.Approaching)
-                                {
-                                    <span class="badge badge-sla-approaching"><i class="bi bi-hourglass-split"></i> Due Soon</span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-sla-healthy"><i class="bi bi-check2"></i> @item.ResolutionDueAt.ToString("MMM dd, HH:mm")</span>
-                                }
-                            </td>
-                            <td class="text-muted small">@item.CreatedAt.ToString("MMM dd, yyyy")</td>
-                            <td>
-                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">
-                                    Details
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.RecentRequests)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-decoration-none text-primary">
+                                        @item.ReferenceNumber
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="fw-medium text-dark">@item.Title</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-secondary border px-2 py-1">@item.CategoryName</span>
+                                </td>
+                                <td>
+                                    @if (item.Priority == RequestPriority.Critical)
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1"><i class="bi bi-lightning-charge-fill me-1"></i>Critical</span>
+                                    }
+                                    else if (item.Priority == RequestPriority.High)
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>High</span>
+                                    }
+                                    else if (item.Priority == RequestPriority.Medium)
+                                    {
+                                        <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle px-2 py-1"><i class="bi bi-dash-circle me-1"></i>Medium</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">Low</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge-status badge-status-@item.Status.ToString().ToLower()">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (item.SlaHealth == SlaHealthStatus.Breached)
+                                    {
+                                        <span class="badge-sla badge-sla-breached"><i class="bi bi-exclamation-octagon-fill"></i> Breached</span>
+                                    }
+                                    else if (item.SlaHealth == SlaHealthStatus.Approaching)
+                                    {
+                                        <span class="badge-sla badge-sla-approaching"><i class="bi bi-hourglass-split"></i> Due Soon</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-sla badge-sla-healthy"><i class="bi bi-check2"></i> @item.ResolutionDueAt.ToString("MMM dd, HH:mm")</span>
+                                    }
+                                </td>
+                                <td class="text-muted small">@item.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td class="text-end">
+                                    <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">
+                                        View Details <i class="bi bi-arrow-right-short"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
     </div>
 </div>

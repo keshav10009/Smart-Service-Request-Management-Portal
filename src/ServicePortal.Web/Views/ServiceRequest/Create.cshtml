@@ -5,123 +5,242 @@
 }
 
 <div class="row justify-content-center">
-    <div class="col-12 col-lg-8">
+    <div class="col-12 col-xl-11">
         <!-- Unverified Email Alert & Simulation Tool (Section 6.1 & AC-01) -->
         @if (isUnverified)
         {
-            <div class="alert alert-warning border-warning shadow-sm mb-4" role="alert">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                    <div>
-                        <h5 class="alert-heading fw-bold mb-1"><i class="bi bi-shield-exclamation"></i> Email Verification Required (AC-01)</h5>
-                        <p class="mb-0 small">
-                            Your account email has not been verified. According to corporate policy, requesters must confirm their email before submitting service requests.
-                        </p>
+            <div class="alert alert-warning border-warning shadow-sm mb-4 portal-card" role="alert">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="fs-2 text-warning"><i class="bi bi-shield-exclamation"></i></div>
+                        <div>
+                            <h5 class="alert-heading fw-bold mb-1">Email Verification Required (AC-01)</h5>
+                            <p class="mb-0 small text-secondary">
+                                Your account email has not been verified yet. Corporate policy requires email verification before submitting new support tickets.
+                            </p>
+                        </div>
                     </div>
                     <form asp-action="SimulateEmailVerification" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-warning btn-sm fw-bold shadow-sm">
-                            <i class="bi bi-check-circle"></i> Verify Email Now (1-Click Demo)
+                        <button type="submit" class="btn btn-warning fw-bold shadow-sm px-3 py-2">
+                            <i class="bi bi-patch-check-fill me-1"></i> Verify Email Now (1-Click Demo)
                         </button>
                     </form>
                 </div>
             </div>
         }
 
-        <div class="card portal-card border-0 shadow-sm">
-            <div class="card-header card-header-clean bg-light d-flex justify-content-between align-items-center">
-                <div>
-                    <h4 class="fw-bold mb-0"><i class="bi bi-plus-circle-fill text-primary me-2"></i> Submit Service Request</h4>
-                    <span class="text-muted small">Our support team will automatically triage and route your ticket</span>
+        <div class="row g-4">
+            <!-- Main Form Column -->
+            <div class="col-12 col-lg-8">
+                <div class="card portal-card border-0 shadow-sm">
+                    <div class="card-header card-header-clean bg-white py-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="kpi-icon-badge badge-bg-indigo" style="width: 42px; height: 42px; font-size: 1.25rem;">
+                                <i class="bi bi-send-plus-fill"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-0 text-dark">Submit Service Request</h4>
+                                <span class="text-muted small">Our intelligent portal routes your ticket to the specialized team</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <form asp-action="Create" method="post" enctype="multipart/form-data" id="createForm">
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                            <!-- Client-Side Duplicate Warning Banner -->
+                            <div id="duplicateWarningBox" class="alert alert-warning border-warning d-none mb-4" role="alert">
+                                <div class="d-flex gap-2">
+                                    <i class="bi bi-exclamation-triangle-fill fs-5 text-warning flex-shrink-0"></i>
+                                    <div>
+                                        <div class="fw-bold">Potential Duplicate Detected</div>
+                                        <span id="duplicateWarningText" class="small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (ViewBag.DuplicateWarning != null)
+                            {
+                                <div class="alert alert-warning border-warning mb-4" role="alert">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                    @ViewBag.DuplicateWarning
+                                </div>
+                            }
+
+                            <!-- Title -->
+                            <div class="mb-4">
+                                <label asp-for="Title" class="form-label fw-bold">Request Title / Summary <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-card-heading"></i></span>
+                                    <input asp-for="Title" class="form-control border-start-0 ps-0" id="titleInput" placeholder="Brief summary of the issue (e.g., VPN connection drops with Error 800)" required />
+                                </div>
+                                <span asp-validation-for="Title" class="text-danger small"></span>
+                                <div class="form-text small text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>Be descriptive to help triage agents match existing known solutions.
+                                </div>
+                            </div>
+
+                            <!-- Category & Priority Row -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label asp-for="CategoryId" class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-tag-fill"></i></span>
+                                        <select asp-for="CategoryId" class="form-select border-start-0 ps-0" id="categorySelect" asp-items="ViewBag.Categories" required>
+                                            <option value="">-- Select Category --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                                    <div class="form-text small text-muted">Automatically routes to the responsible team.</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="Priority" class="form-label fw-bold">Priority Level <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-lightning-charge-fill"></i></span>
+                                        <select asp-for="Priority" class="form-select border-start-0 ps-0" asp-items="Html.GetEnumSelectList<RequestPriority>()">
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="Priority" class="text-danger small"></span>
+                                    <div class="form-text small text-muted">Target SLA: Critical (1h), High (4h), Med (8h), Low (48h).</div>
+                                </div>
+                            </div>
+
+                            <!-- Preferred Contact Method -->
+                            <div class="mb-4">
+                                <label asp-for="PreferredContactMethod" class="form-label fw-bold">Preferred Contact Method</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-chat-square-text-fill"></i></span>
+                                    <select asp-for="PreferredContactMethod" class="form-select border-start-0 ps-0" asp-items="Html.GetEnumSelectList<PreferredContactMethod>()">
+                                    </select>
+                                </div>
+                                <div class="form-text small text-muted">Support agents will prioritize this channel for updates.</div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-4">
+                                <label asp-for="Description" class="form-label fw-bold">Detailed Description <span class="text-danger">*</span></label>
+                                <textarea asp-for="Description" class="form-control" rows="5" placeholder="Include steps to reproduce, hardware serial number, error codes, and when the issue started..." required></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Modern File Attachments Dropzone -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Supporting Attachments (Optional)</label>
+                                <div class="file-dropzone" onclick="document.getElementById('fileInput').click()">
+                                    <div class="file-dropzone-icon">
+                                        <i class="bi bi-cloud-arrow-up-fill"></i>
+                                    </div>
+                                    <div class="fw-semibold text-dark mb-1">Click or drag & drop files here</div>
+                                    <div class="small text-muted mb-2">Supported: PDF, DOCX, XLSX, TXT, PNG, JPG, ZIP (Max 10 MB per file)</div>
+                                    <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                        <span class="badge bg-light text-secondary border">.pdf</span>
+                                        <span class="badge bg-light text-secondary border">.png</span>
+                                        <span class="badge bg-light text-secondary border">.jpg</span>
+                                        <span class="badge bg-light text-secondary border">.docx</span>
+                                        <span class="badge bg-light text-secondary border">.xlsx</span>
+                                        <span class="badge bg-light text-secondary border">.zip</span>
+                                    </div>
+                                    <input type="file" id="fileInput" name="attachments" class="d-none" multiple onchange="handleFileSelect(event)" />
+                                </div>
+                                <div id="selectedFilesList" class="mt-2 d-none">
+                                    <div class="small fw-semibold text-muted mb-1">Selected Files:</div>
+                                    <ul class="list-group list-group-flush small" id="filesUl"></ul>
+                                </div>
+                            </div>
+
+                            <!-- Duplicate Acknowledgment Checkbox -->
+                            <div class="form-check mb-4 p-3 rounded border bg-light-subtle">
+                                <input asp-for="AcknowledgeDuplicateWarning" class="form-check-input ms-0 me-2" id="dupAckCheck" />
+                                <label asp-for="AcknowledgeDuplicateWarning" class="form-check-label small fw-semibold text-dark" for="dupAckCheck">
+                                    I acknowledge potential similarity and confirm this is a distinct request that needs resolution.
+                                </label>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-end align-items-center gap-3 pt-2 border-top">
+                                <a asp-action="Index" class="btn btn-outline-secondary px-4">
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm" @(isUnverified ? "disabled" : "")>
+                                    <i class="bi bi-send-fill me-1"></i> Submit Request
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Cancel</a>
             </div>
 
-            <div class="card-body p-4">
-                <form asp-action="Create" method="post" enctype="multipart/form-data" id="createForm">
-                    @Html.AntiForgeryToken()
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
-
-                    <!-- Client-Side Duplicate Warning Banner -->
-                    <div id="duplicateWarningBox" class="alert alert-warning d-none" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <span id="duplicateWarningText"></span>
+            <!-- Helpful Sidebar Guide -->
+            <div class="col-12 col-lg-4">
+                <!-- SLA Information Card -->
+                <div class="card portal-card border-0 mb-4">
+                    <div class="card-header card-header-clean bg-white py-3">
+                        <span class="fw-bold text-dark"><i class="bi bi-shield-check text-primary me-2"></i> SLA Business Hours</span>
                     </div>
-
-                    @if (ViewBag.DuplicateWarning != null)
-                    {
-                        <div class="alert alert-warning" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            @ViewBag.DuplicateWarning
-                        </div>
-                    }
-
-                    <!-- Title -->
-                    <div class="mb-3">
-                        <label asp-for="Title" class="form-label fw-semibold">Request Title / Summary <span class="text-danger">*</span></label>
-                        <input asp-for="Title" class="form-control" id="titleInput" placeholder="Brief summary of the issue (e.g., VPN connection failure with Error 800)" required />
-                        <span asp-validation-for="Title" class="text-danger small"></span>
-                        <div class="form-text small">Our system checks for similar active requests to prevent duplicate submissions.</div>
-                    </div>
-
-                    <!-- Category & Priority Row -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label asp-for="CategoryId" class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
-                            <select asp-for="CategoryId" class="form-select" id="categorySelect" asp-items="ViewBag.Categories" required>
-                                <option value="">-- Select Category --</option>
-                            </select>
-                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
-                            <div class="form-text small">Categories automatically route to the responsible support team.</div>
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center gap-3 mb-3 p-2 rounded bg-light">
+                            <i class="bi bi-clock-history fs-3 text-indigo"></i>
+                            <div>
+                                <div class="fw-bold text-dark small">Mon - Fri: 09:00 - 18:00</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">Weekends & outside hours pause SLA</div>
+                            </div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label asp-for="Priority" class="form-label fw-semibold">Priority Level <span class="text-danger">*</span></label>
-                            <select asp-for="Priority" class="form-select" asp-items="Html.GetEnumSelectList<RequestPriority>()">
-                            </select>
-                            <span asp-validation-for="Priority" class="text-danger small"></span>
-                            <div class="form-text small">Response Target: Critical (1h), High (4h), Medium (8h), Low (48h)</div>
+                        <div class="small fw-semibold text-muted mb-2">Resolution Targets:</div>
+                        <ul class="list-group list-group-flush small">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                <span><i class="bi bi-circle-fill text-danger me-2" style="font-size: 0.6rem;"></i>Critical Priority</span>
+                                <span class="badge bg-danger-subtle text-danger border">1 Hour</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                <span><i class="bi bi-circle-fill text-warning me-2" style="font-size: 0.6rem;"></i>High Priority</span>
+                                <span class="badge bg-warning-subtle text-warning-emphasis border">4 Hours</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                <span><i class="bi bi-circle-fill text-info me-2" style="font-size: 0.6rem;"></i>Medium Priority</span>
+                                <span class="badge bg-info-subtle text-info-emphasis border">8 Hours</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                <span><i class="bi bi-circle-fill text-secondary me-2" style="font-size: 0.6rem;"></i>Low Priority</span>
+                                <span class="badge bg-secondary-subtle text-secondary border">48 Hours</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Faster Resolution Tips Card -->
+                <div class="card portal-card border-0">
+                    <div class="card-header card-header-clean bg-white py-3">
+                        <span class="fw-bold text-dark"><i class="bi bi-lightbulb-fill text-warning me-2"></i> Faster Resolution Tips</span>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-flex gap-3 mb-3">
+                            <i class="bi bi-camera-fill text-primary fs-5 flex-shrink-0"></i>
+                            <div class="small">
+                                <span class="fw-bold d-block text-dark">Attach Screenshots</span>
+                                <span class="text-muted">Error messages and screenshots reduce back-and-forth by 70%.</span>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3 mb-3">
+                            <i class="bi bi-laptop-fill text-success fs-5 flex-shrink-0"></i>
+                            <div class="small">
+                                <span class="fw-bold d-block text-dark">Include Asset Tag</span>
+                                <span class="text-muted">For hardware or VPN tickets, specify your laptop asset tag.</span>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3">
+                            <i class="bi bi-lock-fill text-indigo fs-5 flex-shrink-0"></i>
+                            <div class="small">
+                                <span class="fw-bold d-block text-dark">Secure Storage</span>
+                                <span class="text-muted">All uploaded files are stored safely outside public web root.</span>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Preferred Contact Method -->
-                    <div class="mb-3">
-                        <label asp-for="PreferredContactMethod" class="form-label fw-semibold">Preferred Contact Method</label>
-                        <select asp-for="PreferredContactMethod" class="form-select" asp-items="Html.GetEnumSelectList<PreferredContactMethod>()">
-                        </select>
-                    </div>
-
-                    <!-- Description -->
-                    <div class="mb-3">
-                        <label asp-for="Description" class="form-label fw-semibold">Detailed Description <span class="text-danger">*</span></label>
-                        <textarea asp-for="Description" class="form-control" rows="5" placeholder="Provide full details, steps to reproduce, device numbers, or error messages..." required></textarea>
-                        <span asp-validation-for="Description" class="text-danger small"></span>
-                    </div>
-
-                    <!-- File Attachments -->
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Supporting Attachments (Optional)</label>
-                        <input type="file" name="attachments" class="form-control" multiple />
-                        <div class="form-text small text-muted">
-                            <i class="bi bi-info-circle"></i> Allowed formats: PDF, DOCX, XLSX, TXT, PNG, JPG, ZIP. Maximum size: 10 MB per file.
-                            Stored securely outside the web root.
-                        </div>
-                    </div>
-
-                    <!-- Duplicate Acknowledgment Checkbox -->
-                    <div class="form-check mb-4 bg-light p-3 rounded border">
-                        <input asp-for="AcknowledgeDuplicateWarning" class="form-check-input" id="dupAckCheck" />
-                        <label asp-for="AcknowledgeDuplicateWarning" class="form-check-label small fw-semibold text-dark" for="dupAckCheck">
-                            Acknowledge warning: Submit anyway even if a similar request was recently logged
-                        </label>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-2">
-                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
-                        <button type="submit" class="btn btn-primary px-4 fw-semibold" @(isUnverified ? "disabled" : "")>
-                            <i class="bi bi-send-fill me-1"></i> Submit Request
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -130,6 +249,25 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // File selection UI feedback
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            const container = document.getElementById('selectedFilesList');
+            const ul = document.getElementById('filesUl');
+            ul.innerHTML = '';
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item d-flex justify-content-between align-items-center px-2 py-1';
+                    li.innerHTML = `<span><i class="bi bi-file-earmark-check text-success me-2"></i>${files[i].name}</span><span class="badge bg-light text-muted">${(files[i].size / 1024).toFixed(1)} KB</span>`;
+                    ul.appendChild(li);
+                }
+                container.classList.remove('d-none');
+            } else {
+                container.classList.add('d-none');
+            }
+        }
+
         // Live client-side duplicate check
         const titleInput = document.getElementById('titleInput');
         const categorySelect = document.getElementById('categorySelect');
@@ -151,7 +289,7 @@
                 .then(r => r.json())
                 .then(data => {
                     if (data && data.hasDuplicate) {
-                        warnText.textContent = `Warning: A similar active request already exists (${data.existingReference}: "${data.existingTitle}"). Please check the acknowledgment box if you wish to submit anyway.`;
+                        warnText.textContent = `A similar active request already exists (${data.existingReference}: "${data.existingTitle}"). Please check the acknowledgment box if you wish to submit anyway.`;
                         warnBox.classList.remove('d-none');
                     } else {
                         warnBox.classList.add('d-none');

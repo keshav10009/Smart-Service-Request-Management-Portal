@@ -4,7 +4,8 @@ namespace ServicePortal.Domain.Entities;
 
 public class ReferenceSequence
 {
-    [Key]
+    public int Id { get; set; }
+
     public int Year { get; set; }
 
     public int LastNumber { get; set; }

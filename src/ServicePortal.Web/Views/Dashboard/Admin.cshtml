@@ -3,45 +3,77 @@
     ViewData["Title"] = "System Administration Dashboard";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
-        <h2 class="fw-bold mb-1">System Administration & Intelligence</h2>
-        <p class="text-muted small mb-0">Organization-wide metrics, service request volumes, security settings, and audit logs</p>
+        <h2 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">System Administration & Intelligence</h2>
+        <p class="text-muted small mb-0">Organization-wide metrics, SLA breach tracking, role controls, and security audit logging</p>
     </div>
     <div class="d-flex gap-2">
         <a asp-controller="Admin" asp-action="AuditLogs" class="btn btn-outline-secondary">
-            <i class="bi bi-journal-text"></i> Audit Trail
+            <i class="bi bi-journal-text me-1"></i> Audit Trail
         </a>
-        <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-primary">
-            <i class="bi bi-collection"></i> Global Requests
+        <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-primary shadow-sm">
+            <i class="bi bi-collection me-1"></i> Global Requests
         </a>
     </div>
 </div>
 
-<!-- Admin Stat Cards -->
+<!-- Admin Stat KPI Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-primary border-4">
-            <div class="stat-value text-primary">@Model.TotalUsersCount</div>
-            <div class="stat-label">Total Users Registered</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Total Users</span>
+                    <div class="kpi-value text-primary">@Model.TotalUsersCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-people text-primary"></i> Registered accounts</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-primary">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-success border-4">
-            <div class="stat-value text-success">@Model.ActiveUsersCount</div>
-            <div class="stat-label">Active Users</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Active Users</span>
+                    <div class="kpi-value text-success">@Model.ActiveUsersCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-shield-check text-success"></i> Enabled logins</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-success">
+                    <i class="bi bi-person-check-fill"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-info border-4">
-            <div class="stat-value text-info">@Model.TotalRequestsCount</div>
-            <div class="stat-label">Total Service Requests</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-indigo">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Total Requests</span>
+                    <div class="kpi-value text-indigo" style="color: #4f46e5;">@Model.TotalRequestsCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-file-earmark-text text-indigo"></i> Org-wide volume</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-indigo">
+                    <i class="bi bi-folder-check"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-danger border-4">
-            <div class="stat-value text-danger">@Model.TotalBreachedRequestsCount</div>
-            <div class="stat-label">SLA Breaches Recorded</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-danger">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">SLA Breaches</span>
+                    <div class="kpi-value text-danger">@Model.TotalBreachedRequestsCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-exclamation-triangle text-danger"></i> Breach records</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-danger">
+                    <i class="bi bi-shield-x"></i>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -50,7 +82,7 @@
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
         <a asp-controller="Admin" asp-action="Users" class="card portal-card p-3 text-decoration-none text-dark d-flex flex-row align-items-center gap-3">
-            <div class="bg-primary text-white rounded p-3 fs-4"><i class="bi bi-people-fill"></i></div>
+            <div class="kpi-icon-badge badge-bg-primary fs-4"><i class="bi bi-people-fill"></i></div>
             <div>
                 <div class="fw-bold">User Accounts</div>
                 <div class="text-muted small">Roles & activation</div>
@@ -59,7 +91,7 @@
     </div>
     <div class="col-6 col-md-3">
         <a asp-controller="Admin" asp-action="Teams" class="card portal-card p-3 text-decoration-none text-dark d-flex flex-row align-items-center gap-3">
-            <div class="bg-success text-white rounded p-3 fs-4"><i class="bi bi-diagram-3-fill"></i></div>
+            <div class="kpi-icon-badge badge-bg-success fs-4"><i class="bi bi-diagram-3-fill"></i></div>
             <div>
                 <div class="fw-bold">Support Teams</div>
                 <div class="text-muted small">Departments & leads</div>
@@ -68,7 +100,7 @@
     </div>
     <div class="col-6 col-md-3">
         <a asp-controller="Admin" asp-action="Categories" class="card portal-card p-3 text-decoration-none text-dark d-flex flex-row align-items-center gap-3">
-            <div class="bg-warning text-dark rounded p-3 fs-4"><i class="bi bi-tags-fill"></i></div>
+            <div class="kpi-icon-badge badge-bg-warning fs-4"><i class="bi bi-tags-fill"></i></div>
             <div>
                 <div class="fw-bold">Categories</div>
                 <div class="text-muted small">Auto team routing</div>
@@ -77,7 +109,7 @@
     </div>
     <div class="col-6 col-md-3">
         <a asp-controller="Admin" asp-action="SlaPolicies" class="card portal-card p-3 text-decoration-none text-dark d-flex flex-row align-items-center gap-3">
-            <div class="bg-danger text-white rounded p-3 fs-4"><i class="bi bi-stopwatch-fill"></i></div>
+            <div class="kpi-icon-badge badge-bg-danger fs-4"><i class="bi bi-stopwatch-fill"></i></div>
             <div>
                 <div class="fw-bold">SLA Policies</div>
                 <div class="text-muted small">Targets by priority</div>
@@ -90,16 +122,19 @@
     <!-- Volume by Category -->
     <div class="col-md-6">
         <div class="card portal-card border-0 h-100">
-            <div class="card-header card-header-clean">
-                <span class="fw-bold"><i class="bi bi-pie-chart me-2"></i> Request Volume by Category</span>
+            <div class="card-header card-header-clean bg-white py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-pie-chart-fill text-primary fs-5"></i>
+                    <span class="fw-bold text-dark">Request Volume by Category</span>
+                </div>
             </div>
             <div class="card-body p-0">
                 <ul class="list-group list-group-flush">
                     @foreach (var c in Model.RequestsByCategory)
                     {
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
-                            <span>@c.Key</span>
-                            <span class="badge bg-primary rounded-pill">@c.Value</span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-3">
+                            <span class="fw-medium text-dark">@c.Key</span>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1">@c.Value</span>
                         </li>
                     }
                 </ul>
@@ -110,16 +145,19 @@
     <!-- Volume by Team -->
     <div class="col-md-6">
         <div class="card portal-card border-0 h-100">
-            <div class="card-header card-header-clean">
-                <span class="fw-bold"><i class="bi bi-bar-chart me-2"></i> Request Distribution by Support Team</span>
+            <div class="card-header card-header-clean bg-white py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-bar-chart-fill text-indigo fs-5" style="color: #4f46e5;"></i>
+                    <span class="fw-bold text-dark">Request Distribution by Support Team</span>
+                </div>
             </div>
             <div class="card-body p-0">
                 <ul class="list-group list-group-flush">
                     @foreach (var t in Model.RequestsByTeam)
                     {
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
-                            <span>@t.Key</span>
-                            <span class="badge bg-info text-dark rounded-pill">@t.Value</span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-3">
+                            <span class="fw-medium text-dark">@t.Key</span>
+                            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill px-3 py-1">@t.Value</span>
                         </li>
                     }
                 </ul>
@@ -130,8 +168,11 @@
 
 <!-- Recent System Activity -->
 <div class="card portal-card border-0 mb-4">
-    <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
-        <span class="fw-bold"><i class="bi bi-activity me-2"></i> Recent Organization Requests</span>
+    <div class="card-header card-header-clean bg-white d-flex justify-content-between align-items-center py-3">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-activity text-primary fs-5"></i>
+            <span class="fw-bold text-dark">Recent Organization Requests</span>
+        </div>
         <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-sm btn-outline-primary">View Global Grid</a>
     </div>
     <div class="card-body p-0">
@@ -155,19 +196,19 @@
                     {
                         <tr>
                             <td>
-                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@r.Id" class="fw-bold text-decoration-none">
+                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@r.Id" class="fw-bold text-decoration-none text-primary">
                                     @r.ReferenceNumber
                                 </a>
                             </td>
-                            <td>@r.Title</td>
-                            <td>@r.RequesterName</td>
-                            <td><span class="badge bg-light text-dark border">@r.CategoryName</span></td>
-                            <td>@r.SupportTeamName</td>
-                            <td>@(r.AssigneeName ?? "<span class='text-muted'>Unassigned</span>")</td>
+                            <td><span class="fw-medium text-dark">@r.Title</span></td>
+                            <td><span class="small text-secondary">@r.RequesterName</span></td>
+                            <td><span class="badge bg-light text-secondary border">@r.CategoryName</span></td>
+                            <td><span class="small text-dark fw-semibold">@r.SupportTeamName</span></td>
+                            <td>@(r.AssigneeName ?? "<span class='text-muted small'>Unassigned</span>")</td>
                             <td>
-                                @if (r.Priority == RequestPriority.Critical) { <span class="badge bg-danger">Critical</span> }
-                                else if (r.Priority == RequestPriority.High) { <span class="badge bg-warning text-dark">High</span> }
-                                else { <span class="badge bg-secondary">@r.Priority</span> }
+                                @if (r.Priority == RequestPriority.Critical) { <span class="badge bg-danger-subtle text-danger border">Critical</span> }
+                                else if (r.Priority == RequestPriority.High) { <span class="badge bg-warning-subtle text-warning-emphasis border">High</span> }
+                                else { <span class="badge bg-secondary-subtle text-secondary border">@r.Priority</span> }
                             </td>
                             <td><span class="badge-status badge-status-@r.Status.ToString().ToLower()">@r.Status</span></td>
                             <td class="text-muted small">@r.CreatedAt.ToString("MMM dd, HH:mm")</td>

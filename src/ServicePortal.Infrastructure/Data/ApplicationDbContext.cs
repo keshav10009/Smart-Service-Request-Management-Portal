@@ -205,7 +205,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // ReferenceSequence configuration
         builder.Entity<ReferenceSequence>(b =>
         {
-            b.HasKey(s => s.Year);
+            b.HasKey(s => s.Id);
+            b.HasIndex(s => s.Year).IsUnique();
             b.Property(s => s.RowVersion).IsConcurrencyToken();
         });
     }

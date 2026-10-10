@@ -3,51 +3,89 @@
     ViewData["Title"] = "Support Agent Dashboard";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
-        <h2 class="fw-bold mb-1">Support Agent Workbench</h2>
-        <p class="text-muted small mb-0">Manage assigned requests, team triage queue, and monitor active SLA deadlines</p>
+        <h2 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">Support Agent Workbench</h2>
+        <p class="text-muted small mb-0">Manage your active queue, claim unassigned requests, and track SLA response targets</p>
     </div>
-    <div>
+    <div class="d-flex gap-2">
         <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-outline-primary">
-            <i class="bi bi-filter"></i> Full Queue Filter
+            <i class="bi bi-filter me-1"></i> Full Queue Filter
+        </a>
+        <a asp-controller="ServiceRequest" asp-action="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Create Request
         </a>
     </div>
 </div>
 
-<!-- Stat Cards -->
+<!-- Stat KPI Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-primary border-4">
-            <div class="stat-value text-primary">@Model.MyAssignedOpenCount</div>
-            <div class="stat-label">Assigned to Me</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Assigned to Me</span>
+                    <div class="kpi-value text-primary">@Model.MyAssignedOpenCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-person-check-fill text-primary"></i> Active workbench</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-primary">
+                    <i class="bi bi-person-workspace"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-info border-4">
-            <div class="stat-value text-info">@Model.UnassignedTeamQueueCount</div>
-            <div class="stat-label">Unassigned Team Queue</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-indigo">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Team Backlog</span>
+                    <div class="kpi-value text-indigo" style="color: #4f46e5;">@Model.UnassignedTeamQueueCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-inbox-fill text-indigo"></i> Needs assignment</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-indigo">
+                    <i class="bi bi-collection-fill"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-warning border-4">
-            <div class="stat-value text-warning">@Model.DueSoonCount</div>
-            <div class="stat-label">SLA Due Soon (&le; 2h)</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">SLA Due Soon</span>
+                    <div class="kpi-value text-warning">@Model.DueSoonCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-hourglass-split text-warning"></i> &le; 2 hours remaining</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-warning">
+                    <i class="bi bi-alarm-fill"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-widget border-start border-danger border-4">
-            <div class="stat-value text-danger">@Model.BreachedCount</div>
-            <div class="stat-label">SLA Breached</div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="kpi-card kpi-card-danger">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">SLA Breached</span>
+                    <div class="kpi-value text-danger">@Model.BreachedCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-exclamation-triangle-fill text-danger"></i> Requires urgent action</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-danger">
+                    <i class="bi bi-shield-x"></i>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- My Active Requests -->
 <div class="card portal-card border-0 mb-4">
-    <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
-        <span class="fw-bold"><i class="bi bi-person-workspace me-2"></i> My Active Assignments</span>
-        <span class="badge bg-primary">@Model.MyActiveRequests.Count Active</span>
+    <div class="card-header card-header-clean bg-white d-flex justify-content-between align-items-center py-3">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-person-workspace text-primary fs-5"></i>
+            <span class="fw-bold text-dark">My Active Assignments</span>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2">@Model.MyActiveRequests.Count Active</span>
+        </div>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -61,35 +99,40 @@
                         <th>Priority</th>
                         <th>Status</th>
                         <th>SLA Deadline</th>
-                        <th>Actions</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Model.MyActiveRequests.Count == 0)
                     {
                         <tr>
-                            <td colspan="8" class="text-center py-4 text-muted">
-                                <i class="bi bi-check2-circle fs-3 d-block text-success mb-2"></i>
-                                Great job! You have no open assigned requests in your queue.
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <div class="empty-state py-2">
+                                    <div class="empty-state-icon" style="background: #ecfdf5; color: #10b981;">
+                                        <i class="bi bi-check2-all"></i>
+                                    </div>
+                                    <h5 class="empty-state-title">All Caught Up!</h5>
+                                    <p class="empty-state-desc mb-0">You have no open assigned requests right now. Pick tickets from the team queue below.</p>
+                                </div>
                             </td>
                         </tr>
                     }
                     @foreach (var item in Model.MyActiveRequests)
                     {
-                        <tr class="@(item.IsSlaBreached ? "table-danger" : item.SlaHealth == SlaHealthStatus.Approaching ? "table-warning" : "")">
+                        <tr class="@(item.IsSlaBreached ? "bg-danger-subtle bg-opacity-25" : item.SlaHealth == SlaHealthStatus.Approaching ? "bg-warning-subtle bg-opacity-25" : "")">
                             <td>
-                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-decoration-none">
+                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-decoration-none text-primary">
                                     @item.ReferenceNumber
                                 </a>
                             </td>
-                            <td><span class="fw-medium">@item.Title</span></td>
-                            <td>@item.RequesterName</td>
-                            <td><span class="badge bg-light text-dark border">@item.CategoryName</span></td>
+                            <td><span class="fw-medium text-dark">@item.Title</span></td>
+                            <td><span class="small text-secondary">@item.RequesterName</span></td>
+                            <td><span class="badge bg-light text-secondary border">@item.CategoryName</span></td>
                             <td>
-                                @if (item.Priority == RequestPriority.Critical) { <span class="badge bg-danger">Critical</span> }
-                                else if (item.Priority == RequestPriority.High) { <span class="badge bg-warning text-dark">High</span> }
-                                else if (item.Priority == RequestPriority.Medium) { <span class="badge bg-info text-dark">Medium</span> }
-                                else { <span class="badge bg-secondary">Low</span> }
+                                @if (item.Priority == RequestPriority.Critical) { <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Critical</span> }
+                                else if (item.Priority == RequestPriority.High) { <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">High</span> }
+                                else if (item.Priority == RequestPriority.Medium) { <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">Medium</span> }
+                                else { <span class="badge bg-secondary-subtle text-secondary border">Low</span> }
                             </td>
                             <td>
                                 <span class="badge-status badge-status-@item.Status.ToString().ToLower()">
@@ -99,20 +142,20 @@
                             <td>
                                 @if (item.SlaHealth == SlaHealthStatus.Breached)
                                 {
-                                    <span class="badge badge-sla-breached"><i class="bi bi-exclamation-triangle-fill"></i> Breached</span>
+                                    <span class="badge-sla badge-sla-breached"><i class="bi bi-exclamation-triangle-fill"></i> Breached</span>
                                 }
                                 else if (item.SlaHealth == SlaHealthStatus.Approaching)
                                 {
-                                    <span class="badge badge-sla-approaching"><i class="bi bi-clock-history"></i> Approaching</span>
+                                    <span class="badge-sla badge-sla-approaching"><i class="bi bi-clock-history"></i> Approaching</span>
                                 }
                                 else
                                 {
-                                    <span class="badge badge-sla-healthy">@item.ResolutionDueAt.ToString("MMM dd, HH:mm")</span>
+                                    <span class="badge-sla badge-sla-healthy"><i class="bi bi-check2"></i> @item.ResolutionDueAt.ToString("MMM dd, HH:mm")</span>
                                 }
                             </td>
-                            <td>
+                            <td class="text-end">
                                 <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
-                                    Manage
+                                    Manage <i class="bi bi-arrow-right-short"></i>
                                 </a>
                             </td>
                         </tr>
@@ -125,9 +168,12 @@
 
 <!-- Team Unassigned Queue -->
 <div class="card portal-card border-0 mb-4">
-    <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
-        <span class="fw-bold"><i class="bi bi-inbox me-2"></i> Team Unassigned Queue (Triage Pool)</span>
-        <span class="badge bg-info text-dark">@Model.TeamQueue.Count Unassigned</span>
+    <div class="card-header card-header-clean bg-white d-flex justify-content-between align-items-center py-3">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-inbox-fill text-indigo fs-5" style="color: #4f46e5;"></i>
+            <span class="fw-bold text-dark">Team Unassigned Queue (Triage Pool)</span>
+            <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle ms-2">@Model.TeamQueue.Count Unassigned</span>
+        </div>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -141,7 +187,7 @@
                         <th>Priority</th>
                         <th>Created</th>
                         <th>SLA Due</th>
-                        <th>Action</th>
+                        <th class="text-end">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -149,7 +195,7 @@
                     {
                         <tr>
                             <td colspan="8" class="text-center py-4 text-muted">
-                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                <i class="bi bi-inbox fs-3 d-block mb-2 text-muted"></i>
                                 No unassigned requests pending in your team's queue.
                             </td>
                         </tr>
@@ -158,23 +204,23 @@
                     {
                         <tr>
                             <td>
-                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-decoration-none">
+                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-decoration-none text-primary">
                                     @item.ReferenceNumber
                                 </a>
                             </td>
-                            <td>@item.Title</td>
-                            <td>@item.RequesterName</td>
-                            <td>@item.CategoryName</td>
+                            <td><span class="fw-medium text-dark">@item.Title</span></td>
+                            <td><span class="small text-secondary">@item.RequesterName</span></td>
+                            <td><span class="badge bg-light text-secondary border">@item.CategoryName</span></td>
                             <td>
-                                @if (item.Priority == RequestPriority.Critical) { <span class="badge bg-danger">Critical</span> }
-                                else if (item.Priority == RequestPriority.High) { <span class="badge bg-warning text-dark">High</span> }
-                                else { <span class="badge bg-secondary">@item.Priority</span> }
+                                @if (item.Priority == RequestPriority.Critical) { <span class="badge bg-danger-subtle text-danger border">Critical</span> }
+                                else if (item.Priority == RequestPriority.High) { <span class="badge bg-warning-subtle text-warning-emphasis border">High</span> }
+                                else { <span class="badge bg-secondary-subtle text-secondary border">@item.Priority</span> }
                             </td>
                             <td class="small text-muted">@item.CreatedAt.ToString("MMM dd, HH:mm")</td>
                             <td class="small text-muted">@item.ResolutionDueAt.ToString("MMM dd, HH:mm")</td>
-                            <td>
+                            <td class="text-end">
                                 <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                                    Review / Assign
+                                    Claim / Assign <i class="bi bi-arrow-right-short"></i>
                                 </a>
                             </td>
                         </tr>

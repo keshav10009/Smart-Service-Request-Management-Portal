@@ -3,48 +3,88 @@
     ViewData["Title"] = "Team Lead Dashboard";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
-        <h2 class="fw-bold mb-1">Team Lead Oversight</h2>
-        <p class="text-muted small mb-0">Monitor team triage, assign requests to agents, review SLA compliance and agent workloads</p>
+        <h2 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.02em;">Team Lead Oversight</h2>
+        <p class="text-muted small mb-0">Monitor department triage, reassign requests, evaluate SLA compliance and team workloads</p>
     </div>
-    <div>
-        <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-primary">
-            <i class="bi bi-card-checklist"></i> View Team Queue
+    <div class="d-flex gap-2">
+        <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-primary shadow-sm">
+            <i class="bi bi-card-checklist me-1"></i> View Team Queue
         </a>
     </div>
 </div>
 
-<!-- Team Metric Widgets -->
+<!-- Team Metric KPI Cards -->
 <div class="row g-3 mb-4">
-    <div class="col-6 col-lg">
-        <div class="stat-widget border-start border-primary border-4">
-            <div class="stat-value text-primary">@Model.TotalTeamRequests</div>
-            <div class="stat-label">Total Team Requests</div>
+    <div class="col-12 col-sm-6 col-xl">
+        <div class="kpi-card kpi-card-primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Team Total</span>
+                    <div class="kpi-value text-primary">@Model.TotalTeamRequests</div>
+                    <span class="kpi-subtext"><i class="bi bi-folder2 text-primary"></i> All active tickets</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-primary">
+                    <i class="bi bi-diagram-3-fill"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-lg">
-        <div class="stat-widget border-start border-warning border-4">
-            <div class="stat-value text-warning">@Model.UnassignedCount</div>
-            <div class="stat-label">Unassigned Pool</div>
+    <div class="col-12 col-sm-6 col-xl">
+        <div class="kpi-card kpi-card-warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Unassigned Pool</span>
+                    <div class="kpi-value text-warning">@Model.UnassignedCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-hourglass-top text-warning"></i> Awaiting lead triage</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-warning">
+                    <i class="bi bi-inbox-fill"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-lg">
-        <div class="stat-widget border-start border-danger border-4">
-            <div class="stat-value text-danger">@Model.BreachedCount</div>
-            <div class="stat-label">SLA Breached</div>
+    <div class="col-12 col-sm-6 col-xl">
+        <div class="kpi-card kpi-card-danger">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">SLA Breached</span>
+                    <div class="kpi-value text-danger">@Model.BreachedCount</div>
+                    <span class="kpi-subtext"><i class="bi bi-exclamation-octagon text-danger"></i> Overdue tickets</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-danger">
+                    <i class="bi bi-shield-x"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-lg">
-        <div class="stat-widget border-start border-success border-4">
-            <div class="stat-value text-success">@Model.SlaComplianceRatePercentage%</div>
-            <div class="stat-label">SLA Compliance</div>
+    <div class="col-12 col-sm-6 col-xl">
+        <div class="kpi-card kpi-card-success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">SLA Compliance</span>
+                    <div class="kpi-value text-success">@Model.SlaComplianceRatePercentage<span class="fs-5">%</span></div>
+                    <span class="kpi-subtext"><i class="bi bi-shield-check text-success"></i> Resolution rate</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-success">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-lg">
-        <div class="stat-widget border-start border-info border-4">
-            <div class="stat-value text-info">@Model.AverageResolutionDurationHours <span class="fs-6 fw-normal text-muted">hrs</span></div>
-            <div class="stat-label">Avg Resolution Time</div>
+    <div class="col-12 col-sm-6 col-xl">
+        <div class="kpi-card kpi-card-indigo">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="kpi-label">Avg Resolution</span>
+                    <div class="kpi-value text-indigo" style="color: #4f46e5;">@Model.AverageResolutionDurationHours<span class="fs-6 fw-normal text-muted ms-1">hrs</span></div>
+                    <span class="kpi-subtext"><i class="bi bi-stopwatch text-indigo"></i> Business hours</span>
+                </div>
+                <div class="kpi-icon-badge badge-bg-indigo">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -53,9 +93,12 @@
     <!-- Agent Workload in Team -->
     <div class="col-lg-7">
         <div class="card portal-card border-0 h-100">
-            <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
-                <span class="fw-bold"><i class="bi bi-people me-2"></i> Agent Workload & Throughput</span>
-                <span class="badge bg-light text-dark border">@Model.AgentWorkload.Count Agents</span>
+            <div class="card-header card-header-clean bg-white py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-people-fill text-primary fs-5"></i>
+                    <span class="fw-bold text-dark">Agent Workload & Throughput</span>
+                    <span class="badge bg-light text-secondary border ms-2">@Model.AgentWorkload.Count Agents</span>
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -80,16 +123,21 @@
                                 var pct = Math.Min(100, agent.ActiveCount * 15);
                                 <tr>
                                     <td class="fw-semibold">
-                                        <i class="bi bi-person-circle text-muted me-1"></i> @agent.AgentName
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="user-avatar-circle" style="width: 28px; height: 28px; font-size: 0.75rem;">
+                                                @(agent.AgentName.Substring(0, 1).ToUpper())
+                                            </div>
+                                            <span class="text-dark">@agent.AgentName</span>
+                                        </div>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge bg-primary rounded-pill">@agent.ActiveCount</span>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">@agent.ActiveCount</span>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge bg-success rounded-pill">@agent.ResolvedCount</span>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">@agent.ResolvedCount</span>
                                     </td>
                                     <td style="width: 35%;">
-                                        <div class="progress" style="height: 8px;">
+                                        <div class="progress" style="height: 8px; border-radius: 999px;">
                                             <div class="progress-bar @(pct > 70 ? "bg-danger" : pct > 40 ? "bg-warning" : "bg-primary")"
                                                  role="progressbar" style="width: @pct%;"></div>
                                         </div>
@@ -106,27 +154,30 @@
     <!-- Status & Priority Distributions -->
     <div class="col-lg-5">
         <div class="card portal-card border-0 h-100">
-            <div class="card-header card-header-clean">
-                <span class="fw-bold"><i class="bi bi-pie-chart me-2"></i> Status Distribution</span>
+            <div class="card-header card-header-clean bg-white py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-pie-chart-fill text-indigo fs-5" style="color: #4f46e5;"></i>
+                    <span class="fw-bold text-dark">Queue Distribution</span>
+                </div>
             </div>
             <div class="card-body p-3">
-                <div class="d-flex flex-column gap-2">
+                <div class="d-flex flex-column gap-2 mb-4">
                     @foreach (var kvp in Model.StatusDistribution)
                     {
-                        <div class="d-flex justify-content-between align-items-center py-1 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center py-2 px-2 rounded hover-bg">
                             <span class="badge-status badge-status-@kvp.Key.ToLower()">@kvp.Key</span>
-                            <span class="fw-bold">@kvp.Value</span>
+                            <span class="fw-bold text-dark">@kvp.Value</span>
                         </div>
                     }
                 </div>
 
-                <div class="fw-bold mt-4 mb-2 small text-muted text-uppercase">By Priority</div>
+                <div class="fw-bold mb-2 small text-muted text-uppercase" style="letter-spacing: 0.05em;">By Priority</div>
                 <div class="d-flex flex-wrap gap-2">
                     @foreach (var kvp in Model.PriorityDistribution)
                     {
-                        <div class="p-2 border rounded text-center flex-fill bg-light">
+                        <div class="p-2 border rounded-3 text-center flex-fill bg-light">
                             <div class="small text-muted">@kvp.Key</div>
-                            <div class="fw-bold fs-5">@kvp.Value</div>
+                            <div class="fw-bold fs-5 text-dark">@kvp.Value</div>
                         </div>
                     }
                 </div>
@@ -137,8 +188,11 @@
 
 <!-- Critical & Breached Attention Queue -->
 <div class="card portal-card border-0 mb-4">
-    <div class="card-header card-header-clean bg-light">
-        <span class="fw-bold text-danger"><i class="bi bi-exclamation-octagon-fill me-2"></i> High Priority & SLA Breached Requests Needing Escalation</span>
+    <div class="card-header card-header-clean bg-danger-subtle bg-opacity-25 py-3">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-octagon-fill text-danger fs-5"></i>
+            <span class="fw-bold text-danger">High Priority & SLA Breached Escalation Pool</span>
+        </div>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -152,7 +206,7 @@
                         <th>Priority</th>
                         <th>Status</th>
                         <th>SLA Deadline</th>
-                        <th>Actions</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -160,28 +214,37 @@
                     {
                         <tr>
                             <td colspan="8" class="text-center py-4 text-muted">
-                                <i class="bi bi-check-circle fs-3 text-success d-block mb-1"></i>
-                                Excellent! No critical or breached requests in your team.
+                                <i class="bi bi-check-circle-fill fs-3 text-success d-block mb-2"></i>
+                                Excellent! No critical or breached requests in your team right now.
                             </td>
                         </tr>
                     }
                     @foreach (var r in Model.CriticalOrBreachedRequests)
                     {
-                        <tr class="table-danger">
+                        <tr class="bg-danger-subtle bg-opacity-25">
                             <td>
-                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@r.Id" class="fw-bold text-dark text-decoration-none">
+                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@r.Id" class="fw-bold text-danger text-decoration-none">
                                     @r.ReferenceNumber
                                 </a>
                             </td>
-                            <td>@r.Title</td>
-                            <td>@r.RequesterName</td>
-                            <td>@(r.AssigneeName ?? "<span class='text-danger fw-bold'>Unassigned</span>")</td>
+                            <td><span class="fw-medium text-dark">@r.Title</span></td>
+                            <td><span class="small text-secondary">@r.RequesterName</span></td>
+                            <td>
+                                @if (string.IsNullOrEmpty(r.AssigneeName))
+                                {
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Unassigned</span>
+                                }
+                                else
+                                {
+                                    <span class="small fw-semibold text-dark">@r.AssigneeName</span>
+                                }
+                            </td>
                             <td><span class="badge bg-danger">@r.Priority</span></td>
                             <td><span class="badge-status badge-status-@r.Status.ToString().ToLower()">@r.Status</span></td>
                             <td class="fw-bold text-danger">@r.ResolutionDueAt.ToString("MMM dd, HH:mm")</td>
-                            <td>
-                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@r.Id" class="btn btn-sm btn-danger">
-                                    Assign / Triage
+                            <td class="text-end">
+                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@r.Id" class="btn btn-sm btn-danger shadow-sm">
+                                    Assign / Triage <i class="bi bi-arrow-right-short"></i>
                                 </a>
                             </td>
                         </tr>
