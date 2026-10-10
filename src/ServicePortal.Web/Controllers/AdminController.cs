@@ -71,6 +71,20 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> VerifyUserEmail(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user != null)
+        {
+            user.EmailConfirmed = true;
+            await _userManager.UpdateAsync(user);
+            TempData["SuccessMessage"] = $"Email for {user.DisplayName} has been marked as verified.";
+        }
+        return RedirectToAction(nameof(Users));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateUserRole(string userId, string newRole)
     {
         var user = await _userManager.FindByIdAsync(userId);

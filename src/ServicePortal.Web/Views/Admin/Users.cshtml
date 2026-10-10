@@ -51,11 +51,20 @@
                             <td>
                                 @if (u.EmailConfirmed)
                                 {
-                                    <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle"></i> Verified</span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle"><i class="bi bi-check-circle-fill me-1"></i> Verified</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-warning-subtle text-warning"><i class="bi bi-clock"></i> Pending (AC-01)</span>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle"><i class="bi bi-clock-history me-1"></i> Pending</span>
+                                        <form asp-action="VerifyUserEmail" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="userId" value="@u.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-warning py-0 px-2 fw-semibold" style="font-size: 0.72rem;" title="Approve & Verify Email">
+                                                <i class="bi bi-patch-check-fill"></i> Verify
+                                            </button>
+                                        </form>
+                                    </div>
                                 }
                             </td>
                             <td>
