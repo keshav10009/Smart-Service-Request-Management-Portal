@@ -15,60 +15,191 @@
 <body>
     @{
         var currentEmail = User.Identity?.Name ?? "";
+        string currentLabel = "Select Persona";
+        string currentRoleBadge = "Demo Switcher";
+        string currentIcon = "bi-person-circle";
+
+        if (currentEmail == "admin@contoso.com") {
+            currentLabel = "Administrator";
+            currentRoleBadge = "Admin";
+            currentIcon = "bi-shield-shaded text-danger";
+        }
+        else if (currentEmail == "lead.it@contoso.com") {
+            currentLabel = "IT Team Lead";
+            currentRoleBadge = "Team Lead";
+            currentIcon = "bi-laptop text-primary";
+        }
+        else if (currentEmail == "lead.hr@contoso.com") {
+            currentLabel = "HR Team Lead";
+            currentRoleBadge = "Team Lead";
+            currentIcon = "bi-person-badge text-warning";
+        }
+        else if (currentEmail == "agent.john@contoso.com") {
+            currentLabel = "Agent John (IT)";
+            currentRoleBadge = "Support Agent";
+            currentIcon = "bi-headset text-info";
+        }
+        else if (currentEmail == "agent.sarah@contoso.com") {
+            currentLabel = "Agent Sarah (Facilities)";
+            currentRoleBadge = "Support Agent";
+            currentIcon = "bi-tools text-info";
+        }
+        else if (currentEmail == "requester1@contoso.com") {
+            currentLabel = "Alice (Verified Requester)";
+            currentRoleBadge = "Requester";
+            currentIcon = "bi-person-fill text-success";
+        }
+        else if (currentEmail == "unverified@contoso.com") {
+            currentLabel = "Bob (Unverified Requester)";
+            currentRoleBadge = "Unverified";
+            currentIcon = "bi-shield-exclamation text-warning";
+        }
+        else if (!string.IsNullOrEmpty(currentEmail)) {
+            currentLabel = currentEmail;
+            currentRoleBadge = "User";
+            currentIcon = "bi-person-check text-primary";
+        }
     }
     <!-- Interactive Demo Switcher Bar for Reviewers & Evaluators -->
     <div class="demo-bar d-flex justify-content-between align-items-center flex-wrap gap-2">
-        <div class="d-flex align-items-center flex-wrap gap-2">
-            <span class="demo-badge-title"><i class="bi bi-people-fill"></i> Switch Persona:</span>
-            <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="email" value="admin@contoso.com" />
-                <button type="submit" class="btn btn-demo @(currentEmail == "admin@contoso.com" ? "active" : "")">
-                    <i class="bi bi-shield-shaded"></i> Admin
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-light opacity-75 small fw-semibold d-none d-sm-inline">
+                <i class="bi bi-people-fill text-info me-1"></i> Switch Persona:
+            </span>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-persona-dropdown dropdown-toggle d-flex align-items-center gap-2" type="button" id="personaSelectDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi @currentIcon"></i>
+                    <span class="fw-bold">@currentLabel</span>
+                    <span class="badge bg-white bg-opacity-25 text-white ms-1 small">@currentRoleBadge</span>
                 </button>
-            </form>
-            <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="email" value="lead.it@contoso.com" />
-                <button type="submit" class="btn btn-demo @(currentEmail == "lead.it@contoso.com" ? "active" : "")">
-                    <i class="bi bi-laptop"></i> IT Lead
-                </button>
-            </form>
-            <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="email" value="lead.hr@contoso.com" />
-                <button type="submit" class="btn btn-demo @(currentEmail == "lead.hr@contoso.com" ? "active" : "")">
-                    <i class="bi bi-person-badge"></i> HR Lead
-                </button>
-            </form>
-            <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="email" value="agent.john@contoso.com" />
-                <button type="submit" class="btn btn-demo @(currentEmail == "agent.john@contoso.com" ? "active" : "")">
-                    <i class="bi bi-headset"></i> Agent John (IT)
-                </button>
-            </form>
-            <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="email" value="agent.sarah@contoso.com" />
-                <button type="submit" class="btn btn-demo @(currentEmail == "agent.sarah@contoso.com" ? "active" : "")">
-                    <i class="bi bi-tools"></i> Agent Sarah (Fac)
-                </button>
-            </form>
-            <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="email" value="requester1@contoso.com" />
-                <button type="submit" class="btn btn-demo @(currentEmail == "requester1@contoso.com" ? "active" : "")">
-                    <i class="bi bi-person-fill"></i> Requester (Alice)
-                </button>
-            </form>
-            <form asp-controller="Account" asp-action="QuickLogin" method="post" class="d-inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="email" value="unverified@contoso.com" />
-                <button type="submit" class="btn btn-demo @(currentEmail == "unverified@contoso.com" ? "active border-warning" : "border-warning")">
-                    <i class="bi bi-shield-exclamation text-warning"></i> Requester (Unverified)
-                </button>
-            </form>
+                <ul class="dropdown-menu dropdown-menu-dark shadow-lg border-0 py-2 persona-menu" aria-labelledby="personaSelectDropdown">
+                    <li class="dropdown-header text-uppercase text-light opacity-50 small fw-bold px-3 py-1">
+                        Leadership & Administration
+                    </li>
+                    <li>
+                        <form asp-controller="Account" asp-action="QuickLogin" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="email" value="admin@contoso.com" />
+                            <button type="submit" class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 @(currentEmail == "admin@contoso.com" ? "active" : "")">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="persona-avatar bg-danger text-white"><i class="bi bi-shield-shaded"></i></span>
+                                    <div>
+                                        <div class="fw-semibold small">Administrator</div>
+                                        <div class="text-white-50" style="font-size: 0.72rem;">admin@contoso.com &bull; Global Setup & Audit</div>
+                                    </div>
+                                </div>
+                                @if (currentEmail == "admin@contoso.com") { <i class="bi bi-check-circle-fill text-success"></i> }
+                            </button>
+                        </form>
+                    </li>
+                    <li>
+                        <form asp-controller="Account" asp-action="QuickLogin" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="email" value="lead.it@contoso.com" />
+                            <button type="submit" class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 @(currentEmail == "lead.it@contoso.com" ? "active" : "")">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="persona-avatar bg-primary text-white"><i class="bi bi-laptop"></i></span>
+                                    <div>
+                                        <div class="fw-semibold small">IT Team Lead</div>
+                                        <div class="text-white-50" style="font-size: 0.72rem;">lead.it@contoso.com &bull; IT Triage & Workloads</div>
+                                    </div>
+                                </div>
+                                @if (currentEmail == "lead.it@contoso.com") { <i class="bi bi-check-circle-fill text-success"></i> }
+                            </button>
+                        </form>
+                    </li>
+                    <li>
+                        <form asp-controller="Account" asp-action="QuickLogin" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="email" value="lead.hr@contoso.com" />
+                            <button type="submit" class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 @(currentEmail == "lead.hr@contoso.com" ? "active" : "")">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="persona-avatar bg-warning text-dark"><i class="bi bi-person-badge"></i></span>
+                                    <div>
+                                        <div class="fw-semibold small">HR Team Lead</div>
+                                        <div class="text-white-50" style="font-size: 0.72rem;">lead.hr@contoso.com &bull; HR & Payroll Workflows</div>
+                                    </div>
+                                </div>
+                                @if (currentEmail == "lead.hr@contoso.com") { <i class="bi bi-check-circle-fill text-success"></i> }
+                            </button>
+                        </form>
+                    </li>
+
+                    <li><hr class="dropdown-divider my-1 opacity-25"></li>
+                    <li class="dropdown-header text-uppercase text-light opacity-50 small fw-bold px-3 py-1">
+                        Support Agents
+                    </li>
+                    <li>
+                        <form asp-controller="Account" asp-action="QuickLogin" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="email" value="agent.john@contoso.com" />
+                            <button type="submit" class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 @(currentEmail == "agent.john@contoso.com" ? "active" : "")">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="persona-avatar bg-info text-dark"><i class="bi bi-headset"></i></span>
+                                    <div>
+                                        <div class="fw-semibold small">Agent John (IT)</div>
+                                        <div class="text-white-50" style="font-size: 0.72rem;">agent.john@contoso.com &bull; Technical Tickets</div>
+                                    </div>
+                                </div>
+                                @if (currentEmail == "agent.john@contoso.com") { <i class="bi bi-check-circle-fill text-success"></i> }
+                            </button>
+                        </form>
+                    </li>
+                    <li>
+                        <form asp-controller="Account" asp-action="QuickLogin" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="email" value="agent.sarah@contoso.com" />
+                            <button type="submit" class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 @(currentEmail == "agent.sarah@contoso.com" ? "active" : "")">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="persona-avatar bg-info text-dark"><i class="bi bi-tools"></i></span>
+                                    <div>
+                                        <div class="fw-semibold small">Agent Sarah (Facilities)</div>
+                                        <div class="text-white-50" style="font-size: 0.72rem;">agent.sarah@contoso.com &bull; Facilities Maintenance</div>
+                                    </div>
+                                </div>
+                                @if (currentEmail == "agent.sarah@contoso.com") { <i class="bi bi-check-circle-fill text-success"></i> }
+                            </button>
+                        </form>
+                    </li>
+
+                    <li><hr class="dropdown-divider my-1 opacity-25"></li>
+                    <li class="dropdown-header text-uppercase text-light opacity-50 small fw-bold px-3 py-1">
+                        Requesters / Employees
+                    </li>
+                    <li>
+                        <form asp-controller="Account" asp-action="QuickLogin" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="email" value="requester1@contoso.com" />
+                            <button type="submit" class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 @(currentEmail == "requester1@contoso.com" ? "active" : "")">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="persona-avatar bg-success text-white"><i class="bi bi-person-fill"></i></span>
+                                    <div>
+                                        <div class="fw-semibold small">Alice (Verified Requester)</div>
+                                        <div class="text-white-50" style="font-size: 0.72rem;">requester1@contoso.com &bull; Standard Support Tickets</div>
+                                    </div>
+                                </div>
+                                @if (currentEmail == "requester1@contoso.com") { <i class="bi bi-check-circle-fill text-success"></i> }
+                            </button>
+                        </form>
+                    </li>
+                    <li>
+                        <form asp-controller="Account" asp-action="QuickLogin" method="post" class="m-0">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="email" value="unverified@contoso.com" />
+                            <button type="submit" class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 @(currentEmail == "unverified@contoso.com" ? "active" : "")">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="persona-avatar bg-warning text-dark"><i class="bi bi-shield-exclamation"></i></span>
+                                    <div>
+                                        <div class="fw-semibold small">Bob (Unverified Requester)</div>
+                                        <div class="text-white-50" style="font-size: 0.72rem;">unverified@contoso.com &bull; Test AC-01 Verification Gate</div>
+                                    </div>
+                                </div>
+                                @if (currentEmail == "unverified@contoso.com") { <i class="bi bi-check-circle-fill text-success"></i> }
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
         <div class="text-light opacity-75 small d-none d-md-block">
             <i class="bi bi-clock-history text-info me-1"></i> SLA Hours: Mon-Fri 09:00 - 18:00
