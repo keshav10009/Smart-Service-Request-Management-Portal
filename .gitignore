@@ -1,0 +1,23 @@
+## .NET Core / Visual Studio .gitignore
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+TestResults/
+[Aa]rtifacts/
+scratch/
+*.sqlite
+*.db
+*.db-shm
+*.db-wal
+appsettings.local.json
+
+# Uploaded attachments storage directory (stored outside web root)
+App_Data/Uploads/*
+!App_Data/Uploads/.gitkeep
