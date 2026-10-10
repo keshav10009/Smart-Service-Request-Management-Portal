@@ -1,0 +1,59 @@
+@model List<ServicePortal.Domain.Entities.SlaPolicy>
+@{
+    ViewData["Title"] = "SLA Policies Configuration";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-stopwatch-fill text-danger"></i> SLA Policies & Target Deadlines</h2>
+        <p class="text-muted small mb-0">Configure business-hour response and resolution targets by priority level</p>
+    </div>
+    <div class="alert alert-info py-1 px-3 mb-0 small">
+        <i class="bi bi-info-circle"></i> Business Hours: Monday &ndash; Friday 09:00 &ndash; 18:00 (Weekends Excluded)
+    </div>
+</div>
+
+<div class="row g-4">
+    @foreach (var policy in Model)
+    {
+        <div class="col-md-6 col-lg-3">
+            <div class="card portal-card h-100 border-0 shadow-sm border-top border-4 @(policy.Priority == RequestPriority.Critical ? "border-danger" : policy.Priority == RequestPriority.High ? "border-warning" : policy.Priority == RequestPriority.Medium ? "border-info" : "border-secondary")">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold mb-0">@policy.Priority</h4>
+                        <span class="badge @(policy.IsActive ? "bg-success" : "bg-secondary")">@(policy.IsActive ? "Active" : "Inactive")</span>
+                    </div>
+
+                    <form asp-action="UpdateSlaPolicy" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@policy.Id" />
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-muted">First Response Target (Hours)</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" name="responseHours" value="@policy.ResponseTargetHours" min="1" max="1000" class="form-control" required />
+                                <span class="input-group-text">hrs</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-muted">Resolution Target (Hours)</label>
+                            <div class="input-group input-group-sm">
+                                <input type="number" name="resolutionHours" value="@policy.ResolutionTargetHours" min="1" max="1000" class="form-control" required />
+                                <span class="input-group-text">hrs</span>
+                            </div>
+                        </div>
+
+                        <div class="text-muted small mb-3" style="font-size: 0.72rem;">
+                            Updated: @policy.UpdatedAt.ToString("MMM dd, yyyy")
+                        </div>
+
+                        <button type="submit" class="btn btn-sm btn-outline-primary w-100">
+                            Save Target Hours
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>

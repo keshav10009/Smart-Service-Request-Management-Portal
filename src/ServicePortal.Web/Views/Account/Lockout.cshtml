@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Account Locked Out";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-6 text-center">
+        <div class="card portal-card border-0 p-5 shadow-sm">
+            <div class="text-danger mb-3">
+                <i class="bi bi-lock-fill display-1"></i>
+            </div>
+            <h2 class="fw-bold">Security Lockout</h2>
+            <p class="text-muted mt-2">
+                This account has been temporarily locked out after repeated failed sign-in attempts to prevent brute-force attacks. Please try again after 5 minutes or reset your password.
+            </p>
+            <div class="mt-4">
+                <a asp-action="Login" class="btn btn-primary px-4">
+                    <i class="bi bi-box-arrow-in-left"></i> Return to Sign In
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

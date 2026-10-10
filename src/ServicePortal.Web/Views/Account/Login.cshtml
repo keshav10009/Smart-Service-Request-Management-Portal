@@ -1,0 +1,91 @@
+@model ServicePortal.Web.Controllers.LoginViewModel
+@{
+    ViewData["Title"] = "Sign In";
+}
+
+<div class="row justify-content-center align-items-center py-4">
+    <div class="col-12 col-md-8 col-lg-5">
+        <div class="card portal-card border-0 shadow">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="navbar-brand-badge fs-4 mb-2">
+                        <i class="bi bi-shield-check"></i> Contoso SSRMP
+                    </span>
+                    <h3 class="fw-bold mt-2">Welcome Back</h3>
+                    <p class="text-muted small">Sign in to access your service requests and support queue</p>
+                </div>
+
+                <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-semibold small">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" class="form-control" placeholder="name@contoso.com" id="emailInput" required />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label asp-for="Password" class="form-label fw-semibold small mb-0">Password</label>
+                            <a asp-action="ForgotPassword" class="small text-decoration-none">Forgot password?</a>
+                        </div>
+                        <div class="input-group mt-1">
+                            <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                            <input asp-for="Password" class="form-control" placeholder="••••••••" id="passwordInput" required />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label small text-muted">Remember this device</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Sign In</button>
+                </form>
+
+                <hr class="my-4">
+
+                <!-- One-click Demo Credentials Helper -->
+                <div class="bg-light p-3 rounded-3 small">
+                    <div class="fw-bold text-dark mb-2"><i class="bi bi-lightning-charge-fill text-warning"></i> Demo Accounts (Click to Autofill):</div>
+                    <div class="d-grid gap-1">
+                        <button type="button" class="btn btn-sm btn-outline-secondary text-start" onclick="fillCreds('admin@contoso.com', 'Pass@123')">
+                            <strong>Administrator:</strong> admin@contoso.com
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary text-start" onclick="fillCreds('lead.it@contoso.com', 'Pass@123')">
+                            <strong>Team Lead:</strong> lead.it@contoso.com
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary text-start" onclick="fillCreds('agent.john@contoso.com', 'Pass@123')">
+                            <strong>Support Agent:</strong> agent.john@contoso.com
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary text-start" onclick="fillCreds('requester1@contoso.com', 'Pass@123')">
+                            <strong>Requester (Verified):</strong> requester1@contoso.com
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-warning text-start" onclick="fillCreds('unverified@contoso.com', 'Pass@123')">
+                            <strong>Requester (Unverified):</strong> unverified@contoso.com
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4 small text-muted">
+                    Don't have an account? <a asp-action="Register" class="text-decoration-none fw-semibold">Register here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function fillCreds(email, password) {
+            document.getElementById('emailInput').value = email;
+            document.getElementById('passwordInput').value = password;
+        }
+    </script>
+}

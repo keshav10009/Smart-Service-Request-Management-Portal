@@ -1,25 +1,47 @@
-﻿@model ErrorViewModel
+@model ServicePortal.Web.Models.ErrorViewModel
 @{
-    ViewData["Title"] = "Error";
+    ViewData["Title"] = "System Error";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-6 text-center">
+        <div class="card portal-card border-0 p-5 shadow-sm">
+            <div class="text-danger mb-3">
+                <i class="bi bi-exclamation-triangle-fill display-1"></i>
+            </div>
+            <h2 class="fw-bold">An Unexpected Error Occurred</h2>
+            <p class="text-muted mt-2">
+                An internal issue prevented this request from completing. The incident has been recorded in the central structured audit logs (AC-11).
+            </p>
 
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
+            <div class="bg-light p-3 rounded-3 text-start mt-3 small border">
+                @if (Model.ShowCorrelationId)
+                {
+                    <div class="mb-1">
+                        <strong>Correlation Identifier (AC-11):</strong>
+                        <code class="text-primary fw-bold">@Model.CorrelationId</code>
+                    </div>
+                }
+                @if (Model.ShowRequestId)
+                {
+                    <div>
+                        <strong>Trace Identifier:</strong>
+                        <code>@Model.RequestId</code>
+                    </div>
+                }
+                <div class="text-muted mt-2" style="font-size: 0.78rem;">
+                    <i class="bi bi-shield-check"></i> Sensitive database connection details and stack traces have been concealed from the client for security compliance.
+                </div>
+            </div>
 
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+            <div class="mt-4 d-flex justify-content-center gap-2">
+                <a asp-controller="Dashboard" asp-action="Index" class="btn btn-primary px-4">
+                    <i class="bi bi-arrow-left"></i> Return to Dashboard
+                </a>
+                <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-outline-secondary px-4">
+                    View Requests
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

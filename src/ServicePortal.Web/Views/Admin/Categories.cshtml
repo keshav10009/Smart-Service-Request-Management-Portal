@@ -1,0 +1,87 @@
+@model List<ServicePortal.Domain.Entities.Category>
+@{
+    ViewData["Title"] = "Service Categories";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-tags-fill text-warning"></i> Service Categories & Routing</h2>
+        <p class="text-muted small mb-0">Define catalog categories and map each category to its responsible support team</p>
+    </div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCatModal">
+        <i class="bi bi-plus-lg"></i> Create Category
+    </button>
+</div>
+
+<div class="card portal-card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-portal table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Category Name</th>
+                        <th>Description</th>
+                        <th>Mapped Support Team (Auto-Routing)</th>
+                        <th>Status</th>
+                        <th>Active Requests</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cat in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-dark">@cat.Name</td>
+                            <td class="text-muted small">@cat.Description</td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary border px-3 py-2">
+                                    <i class="bi bi-arrow-right-short"></i> @cat.SupportTeam.Name
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge @(cat.IsActive ? "bg-success" : "bg-secondary")">
+                                    @(cat.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td class="fw-semibold">@cat.Requests.Count</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Create Category -->
+<div class="modal fade" id="createCatModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="CreateCategory" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Create Service Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Category Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Identity Access & MFA" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Mapped Support Team</label>
+                        <select name="supportTeamId" class="form-select" asp-items="ViewBag.Teams" required>
+                            <option value="">-- Select Team --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Category purpose and scope..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

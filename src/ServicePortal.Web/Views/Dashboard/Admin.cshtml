@@ -1,0 +1,180 @@
+@model ServicePortal.Application.DTOs.AdminDashboardDto
+@{
+    ViewData["Title"] = "System Administration Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="fw-bold mb-1">System Administration & Intelligence</h2>
+        <p class="text-muted small mb-0">Organization-wide metrics, service request volumes, security settings, and audit logs</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Admin" asp-action="AuditLogs" class="btn btn-outline-secondary">
+            <i class="bi bi-journal-text"></i> Audit Trail
+        </a>
+        <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-primary">
+            <i class="bi bi-collection"></i> Global Requests
+        </a>
+    </div>
+</div>
+
+<!-- Admin Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-widget border-start border-primary border-4">
+            <div class="stat-value text-primary">@Model.TotalUsersCount</div>
+            <div class="stat-label">Total Users Registered</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-widget border-start border-success border-4">
+            <div class="stat-value text-success">@Model.ActiveUsersCount</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-widget border-start border-info border-4">
+            <div class="stat-value text-info">@Model.TotalRequestsCount</div>
+            <div class="stat-label">Total Service Requests</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-widget border-start border-danger border-4">
+            <div class="stat-value text-danger">@Model.TotalBreachedRequestsCount</div>
+            <div class="stat-label">SLA Breaches Recorded</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Admin Navigation Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <a asp-controller="Admin" asp-action="Users" class="card portal-card p-3 text-decoration-none text-dark d-flex flex-row align-items-center gap-3">
+            <div class="bg-primary text-white rounded p-3 fs-4"><i class="bi bi-people-fill"></i></div>
+            <div>
+                <div class="fw-bold">User Accounts</div>
+                <div class="text-muted small">Roles & activation</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a asp-controller="Admin" asp-action="Teams" class="card portal-card p-3 text-decoration-none text-dark d-flex flex-row align-items-center gap-3">
+            <div class="bg-success text-white rounded p-3 fs-4"><i class="bi bi-diagram-3-fill"></i></div>
+            <div>
+                <div class="fw-bold">Support Teams</div>
+                <div class="text-muted small">Departments & leads</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a asp-controller="Admin" asp-action="Categories" class="card portal-card p-3 text-decoration-none text-dark d-flex flex-row align-items-center gap-3">
+            <div class="bg-warning text-dark rounded p-3 fs-4"><i class="bi bi-tags-fill"></i></div>
+            <div>
+                <div class="fw-bold">Categories</div>
+                <div class="text-muted small">Auto team routing</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a asp-controller="Admin" asp-action="SlaPolicies" class="card portal-card p-3 text-decoration-none text-dark d-flex flex-row align-items-center gap-3">
+            <div class="bg-danger text-white rounded p-3 fs-4"><i class="bi bi-stopwatch-fill"></i></div>
+            <div>
+                <div class="fw-bold">SLA Policies</div>
+                <div class="text-muted small">Targets by priority</div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Volume by Category -->
+    <div class="col-md-6">
+        <div class="card portal-card border-0 h-100">
+            <div class="card-header card-header-clean">
+                <span class="fw-bold"><i class="bi bi-pie-chart me-2"></i> Request Volume by Category</span>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @foreach (var c in Model.RequestsByCategory)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                            <span>@c.Key</span>
+                            <span class="badge bg-primary rounded-pill">@c.Value</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Volume by Team -->
+    <div class="col-md-6">
+        <div class="card portal-card border-0 h-100">
+            <div class="card-header card-header-clean">
+                <span class="fw-bold"><i class="bi bi-bar-chart me-2"></i> Request Distribution by Support Team</span>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @foreach (var t in Model.RequestsByTeam)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+                            <span>@t.Key</span>
+                            <span class="badge bg-info text-dark rounded-pill">@t.Value</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent System Activity -->
+<div class="card portal-card border-0 mb-4">
+    <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
+        <span class="fw-bold"><i class="bi bi-activity me-2"></i> Recent Organization Requests</span>
+        <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-sm btn-outline-primary">View Global Grid</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-portal table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Title</th>
+                        <th>Requester</th>
+                        <th>Category</th>
+                        <th>Team</th>
+                        <th>Assignee</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.RecentSystemActivity)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@r.Id" class="fw-bold text-decoration-none">
+                                    @r.ReferenceNumber
+                                </a>
+                            </td>
+                            <td>@r.Title</td>
+                            <td>@r.RequesterName</td>
+                            <td><span class="badge bg-light text-dark border">@r.CategoryName</span></td>
+                            <td>@r.SupportTeamName</td>
+                            <td>@(r.AssigneeName ?? "<span class='text-muted'>Unassigned</span>")</td>
+                            <td>
+                                @if (r.Priority == RequestPriority.Critical) { <span class="badge bg-danger">Critical</span> }
+                                else if (r.Priority == RequestPriority.High) { <span class="badge bg-warning text-dark">High</span> }
+                                else { <span class="badge bg-secondary">@r.Priority</span> }
+                            </td>
+                            <td><span class="badge-status badge-status-@r.Status.ToString().ToLower()">@r.Status</span></td>
+                            <td class="text-muted small">@r.CreatedAt.ToString("MMM dd, HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

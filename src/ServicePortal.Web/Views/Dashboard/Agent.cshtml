@@ -1,0 +1,186 @@
+@model ServicePortal.Application.DTOs.AgentDashboardDto
+@{
+    ViewData["Title"] = "Support Agent Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="fw-bold mb-1">Support Agent Workbench</h2>
+        <p class="text-muted small mb-0">Manage assigned requests, team triage queue, and monitor active SLA deadlines</p>
+    </div>
+    <div>
+        <a asp-controller="ServiceRequest" asp-action="Index" class="btn btn-outline-primary">
+            <i class="bi bi-filter"></i> Full Queue Filter
+        </a>
+    </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-widget border-start border-primary border-4">
+            <div class="stat-value text-primary">@Model.MyAssignedOpenCount</div>
+            <div class="stat-label">Assigned to Me</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-widget border-start border-info border-4">
+            <div class="stat-value text-info">@Model.UnassignedTeamQueueCount</div>
+            <div class="stat-label">Unassigned Team Queue</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-widget border-start border-warning border-4">
+            <div class="stat-value text-warning">@Model.DueSoonCount</div>
+            <div class="stat-label">SLA Due Soon (&le; 2h)</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-widget border-start border-danger border-4">
+            <div class="stat-value text-danger">@Model.BreachedCount</div>
+            <div class="stat-label">SLA Breached</div>
+        </div>
+    </div>
+</div>
+
+<!-- My Active Requests -->
+<div class="card portal-card border-0 mb-4">
+    <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
+        <span class="fw-bold"><i class="bi bi-person-workspace me-2"></i> My Active Assignments</span>
+        <span class="badge bg-primary">@Model.MyActiveRequests.Count Active</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-portal table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Title</th>
+                        <th>Requester</th>
+                        <th>Category</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>SLA Deadline</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.MyActiveRequests.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <i class="bi bi-check2-circle fs-3 d-block text-success mb-2"></i>
+                                Great job! You have no open assigned requests in your queue.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var item in Model.MyActiveRequests)
+                    {
+                        <tr class="@(item.IsSlaBreached ? "table-danger" : item.SlaHealth == SlaHealthStatus.Approaching ? "table-warning" : "")">
+                            <td>
+                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-decoration-none">
+                                    @item.ReferenceNumber
+                                </a>
+                            </td>
+                            <td><span class="fw-medium">@item.Title</span></td>
+                            <td>@item.RequesterName</td>
+                            <td><span class="badge bg-light text-dark border">@item.CategoryName</span></td>
+                            <td>
+                                @if (item.Priority == RequestPriority.Critical) { <span class="badge bg-danger">Critical</span> }
+                                else if (item.Priority == RequestPriority.High) { <span class="badge bg-warning text-dark">High</span> }
+                                else if (item.Priority == RequestPriority.Medium) { <span class="badge bg-info text-dark">Medium</span> }
+                                else { <span class="badge bg-secondary">Low</span> }
+                            </td>
+                            <td>
+                                <span class="badge-status badge-status-@item.Status.ToString().ToLower()">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.SlaHealth == SlaHealthStatus.Breached)
+                                {
+                                    <span class="badge badge-sla-breached"><i class="bi bi-exclamation-triangle-fill"></i> Breached</span>
+                                }
+                                else if (item.SlaHealth == SlaHealthStatus.Approaching)
+                                {
+                                    <span class="badge badge-sla-approaching"><i class="bi bi-clock-history"></i> Approaching</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-sla-healthy">@item.ResolutionDueAt.ToString("MMM dd, HH:mm")</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                    Manage
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Team Unassigned Queue -->
+<div class="card portal-card border-0 mb-4">
+    <div class="card-header card-header-clean d-flex justify-content-between align-items-center">
+        <span class="fw-bold"><i class="bi bi-inbox me-2"></i> Team Unassigned Queue (Triage Pool)</span>
+        <span class="badge bg-info text-dark">@Model.TeamQueue.Count Unassigned</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-portal table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Title</th>
+                        <th>Requester</th>
+                        <th>Category</th>
+                        <th>Priority</th>
+                        <th>Created</th>
+                        <th>SLA Due</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.TeamQueue.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                No unassigned requests pending in your team's queue.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var item in Model.TeamQueue)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-decoration-none">
+                                    @item.ReferenceNumber
+                                </a>
+                            </td>
+                            <td>@item.Title</td>
+                            <td>@item.RequesterName</td>
+                            <td>@item.CategoryName</td>
+                            <td>
+                                @if (item.Priority == RequestPriority.Critical) { <span class="badge bg-danger">Critical</span> }
+                                else if (item.Priority == RequestPriority.High) { <span class="badge bg-warning text-dark">High</span> }
+                                else { <span class="badge bg-secondary">@item.Priority</span> }
+                            </td>
+                            <td class="small text-muted">@item.CreatedAt.ToString("MMM dd, HH:mm")</td>
+                            <td class="small text-muted">@item.ResolutionDueAt.ToString("MMM dd, HH:mm")</td>
+                            <td>
+                                <a asp-controller="ServiceRequest" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    Review / Assign
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

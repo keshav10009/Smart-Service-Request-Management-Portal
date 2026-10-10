@@ -1,0 +1,166 @@
+@model ServicePortal.Application.DTOs.CreateRequestDto
+@{
+    ViewData["Title"] = "Submit Service Request";
+    var isUnverified = ViewBag.IsEmailUnverified == true;
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <!-- Unverified Email Alert & Simulation Tool (Section 6.1 & AC-01) -->
+        @if (isUnverified)
+        {
+            <div class="alert alert-warning border-warning shadow-sm mb-4" role="alert">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div>
+                        <h5 class="alert-heading fw-bold mb-1"><i class="bi bi-shield-exclamation"></i> Email Verification Required (AC-01)</h5>
+                        <p class="mb-0 small">
+                            Your account email has not been verified. According to corporate policy, requesters must confirm their email before submitting service requests.
+                        </p>
+                    </div>
+                    <form asp-action="SimulateEmailVerification" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-warning btn-sm fw-bold shadow-sm">
+                            <i class="bi bi-check-circle"></i> Verify Email Now (1-Click Demo)
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+
+        <div class="card portal-card border-0 shadow-sm">
+            <div class="card-header card-header-clean bg-light d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="fw-bold mb-0"><i class="bi bi-plus-circle-fill text-primary me-2"></i> Submit Service Request</h4>
+                    <span class="text-muted small">Our support team will automatically triage and route your ticket</span>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Cancel</a>
+            </div>
+
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post" enctype="multipart/form-data" id="createForm">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <!-- Client-Side Duplicate Warning Banner -->
+                    <div id="duplicateWarningBox" class="alert alert-warning d-none" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span id="duplicateWarningText"></span>
+                    </div>
+
+                    @if (ViewBag.DuplicateWarning != null)
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            @ViewBag.DuplicateWarning
+                        </div>
+                    }
+
+                    <!-- Title -->
+                    <div class="mb-3">
+                        <label asp-for="Title" class="form-label fw-semibold">Request Title / Summary <span class="text-danger">*</span></label>
+                        <input asp-for="Title" class="form-control" id="titleInput" placeholder="Brief summary of the issue (e.g., VPN connection failure with Error 800)" required />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                        <div class="form-text small">Our system checks for similar active requests to prevent duplicate submissions.</div>
+                    </div>
+
+                    <!-- Category & Priority Row -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="CategoryId" class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                            <select asp-for="CategoryId" class="form-select" id="categorySelect" asp-items="ViewBag.Categories" required>
+                                <option value="">-- Select Category --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                            <div class="form-text small">Categories automatically route to the responsible support team.</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Priority" class="form-label fw-semibold">Priority Level <span class="text-danger">*</span></label>
+                            <select asp-for="Priority" class="form-select" asp-items="Html.GetEnumSelectList<RequestPriority>()">
+                            </select>
+                            <span asp-validation-for="Priority" class="text-danger small"></span>
+                            <div class="form-text small">Response Target: Critical (1h), High (4h), Medium (8h), Low (48h)</div>
+                        </div>
+                    </div>
+
+                    <!-- Preferred Contact Method -->
+                    <div class="mb-3">
+                        <label asp-for="PreferredContactMethod" class="form-label fw-semibold">Preferred Contact Method</label>
+                        <select asp-for="PreferredContactMethod" class="form-select" asp-items="Html.GetEnumSelectList<PreferredContactMethod>()">
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-semibold">Detailed Description <span class="text-danger">*</span></label>
+                        <textarea asp-for="Description" class="form-control" rows="5" placeholder="Provide full details, steps to reproduce, device numbers, or error messages..." required></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <!-- File Attachments -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Supporting Attachments (Optional)</label>
+                        <input type="file" name="attachments" class="form-control" multiple />
+                        <div class="form-text small text-muted">
+                            <i class="bi bi-info-circle"></i> Allowed formats: PDF, DOCX, XLSX, TXT, PNG, JPG, ZIP. Maximum size: 10 MB per file.
+                            Stored securely outside the web root.
+                        </div>
+                    </div>
+
+                    <!-- Duplicate Acknowledgment Checkbox -->
+                    <div class="form-check mb-4 bg-light p-3 rounded border">
+                        <input asp-for="AcknowledgeDuplicateWarning" class="form-check-input" id="dupAckCheck" />
+                        <label asp-for="AcknowledgeDuplicateWarning" class="form-check-label small fw-semibold text-dark" for="dupAckCheck">
+                            Acknowledge warning: Submit anyway even if a similar request was recently logged
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold" @(isUnverified ? "disabled" : "")>
+                            <i class="bi bi-send-fill me-1"></i> Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Live client-side duplicate check
+        const titleInput = document.getElementById('titleInput');
+        const categorySelect = document.getElementById('categorySelect');
+        const warnBox = document.getElementById('duplicateWarningBox');
+        const warnText = document.getElementById('duplicateWarningText');
+
+        function triggerDuplicateCheck() {
+            const title = titleInput.value.trim();
+            const categoryId = categorySelect.value;
+            if (title.length >= 5 && categoryId) {
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('categoryId', categoryId);
+
+                fetch('/ServiceRequest/CheckDuplicate', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.hasDuplicate) {
+                        warnText.textContent = `Warning: A similar active request already exists (${data.existingReference}: "${data.existingTitle}"). Please check the acknowledgment box if you wish to submit anyway.`;
+                        warnBox.classList.remove('d-none');
+                    } else {
+                        warnBox.classList.add('d-none');
+                    }
+                }).catch(() => {});
+            }
+        }
+
+        titleInput.addEventListener('blur', triggerDuplicateCheck);
+        categorySelect.addEventListener('change', triggerDuplicateCheck);
+    </script>
+}

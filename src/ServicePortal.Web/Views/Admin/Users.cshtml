@@ -1,0 +1,99 @@
+@model List<ServicePortal.Web.Controllers.AdminUserViewModel>
+@{
+    ViewData["Title"] = "User & Role Management";
+    var allRoles = (string[])ViewBag.AllRoles;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="bi bi-people-fill text-primary"></i> User Accounts & Role Management</h2>
+        <p class="text-muted small mb-0">Control account activation, email verification status, and role assignments</p>
+    </div>
+    <a asp-controller="Dashboard" asp-action="Admin" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Admin Dashboard
+    </a>
+</div>
+
+<div class="card portal-card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-portal table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Department</th>
+                        <th>Assigned Team</th>
+                        <th>Email Verified</th>
+                        <th>Status</th>
+                        <th>Assigned Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model)
+                    {
+                        <tr class="@(!u.IsActive ? "table-secondary opacity-75" : "")">
+                            <td>
+                                <div class="fw-bold text-dark">@u.DisplayName</div>
+                                <div class="text-muted small">@u.Email</div>
+                            </td>
+                            <td>@(u.Department ?? "N/A")</td>
+                            <td>
+                                @if (string.IsNullOrEmpty(u.TeamName))
+                                {
+                                    <span class="text-muted">None</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-light text-dark border">@u.TeamName</span>
+                                }
+                            </td>
+                            <td>
+                                @if (u.EmailConfirmed)
+                                {
+                                    <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle"></i> Verified</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning-subtle text-warning"><i class="bi bi-clock"></i> Pending (AC-01)</span>
+                                }
+                            </td>
+                            <td>
+                                @if (u.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Deactivated (AC Section 6.1)</span>
+                                }
+                            </td>
+                            <td>
+                                <form asp-action="UpdateUserRole" method="post" class="d-flex gap-1 align-items-center">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@u.Id" />
+                                    <select name="newRole" class="form-select form-select-sm" style="min-width: 140px;">
+                                        @foreach (var role in allRoles)
+                                        {
+                                            <option value="@role" selected="@(u.Roles.Contains(role))">@role</option>
+                                        }
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Update Role">Save</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form asp-action="ToggleUserActive" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@u.Id" />
+                                    <button type="submit" class="btn btn-sm @(u.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                                        @(u.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

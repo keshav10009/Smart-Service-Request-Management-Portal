@@ -1,0 +1,254 @@
+@model ServicePortal.Application.DTOs.PagedResult<ServicePortal.Application.DTOs.ServiceRequestListItemDto>
+@{
+    ViewData["Title"] = "Service Requests";
+    var filter = (ServicePortal.Application.DTOs.RequestFilterDto)ViewBag.Filter;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h2 class="fw-bold mb-1">Service Requests</h2>
+        <p class="text-muted small mb-0">Browse, filter, and track service requests according to your authorized scope</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="ExportCsv"
+           asp-route-searchTerm="@filter.SearchTerm"
+           asp-route-status="@filter.Status"
+           asp-route-categoryId="@filter.CategoryId"
+           asp-route-priority="@filter.Priority"
+           asp-route-teamId="@filter.TeamId"
+           asp-route-slaState="@filter.SlaState"
+           class="btn btn-outline-success">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+        </a>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Submit Request
+        </a>
+    </div>
+</div>
+
+<!-- Filter Toolbar -->
+<div class="card portal-card border-0 mb-4">
+    <div class="card-body p-3">
+        <form method="get" asp-action="Index">
+            <div class="row g-2">
+                <div class="col-12 col-md-3">
+                    <label class="form-label small fw-semibold text-muted mb-1">Search Keywords</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" name="SearchTerm" value="@filter.SearchTerm" class="form-control" placeholder="Ref, title, requester, description..." />
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <label class="form-label small fw-semibold text-muted mb-1">Status</label>
+                    <select name="Status" class="form-select form-select-sm" asp-items="Html.GetEnumSelectList<RequestStatus>()">
+                        <option value="">All Statuses</option>
+                    </select>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <label class="form-label small fw-semibold text-muted mb-1">Priority</label>
+                    <select name="Priority" class="form-select form-select-sm" asp-items="Html.GetEnumSelectList<RequestPriority>()">
+                        <option value="">All Priorities</option>
+                    </select>
+                </div>
+
+                <div class="col-6 col-md-2">
+                    <label class="form-label small fw-semibold text-muted mb-1">Category</label>
+                    <select name="CategoryId" class="form-select form-select-sm" asp-items="ViewBag.Categories">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <label class="form-label small fw-semibold text-muted mb-1">SLA Health State</label>
+                    <select name="SlaState" class="form-select form-select-sm">
+                        <option value="">All SLA States</option>
+                        <option value="breached" selected="@(filter.SlaState == "breached")">Breached Only</option>
+                        <option value="approaching" selected="@(filter.SlaState == "approaching")">Approaching (&le; 2h)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="small text-muted">Sort by:</span>
+                    <select name="SortBy" class="form-select form-select-sm w-auto d-inline">
+                        <option value="CreatedAt" selected="@(filter.SortBy == "CreatedAt")">Date Created</option>
+                        <option value="Reference" selected="@(filter.SortBy == "Reference")">Reference #</option>
+                        <option value="Priority" selected="@(filter.SortBy == "Priority")">Priority</option>
+                        <option value="Status" selected="@(filter.SortBy == "Status")">Status</option>
+                        <option value="SlaDue" selected="@(filter.SortBy == "SlaDue")">SLA Deadline</option>
+                    </select>
+                    <select name="SortDescending" class="form-select form-select-sm w-auto d-inline">
+                        <option value="true" selected="@(filter.SortDescending)">Descending</option>
+                        <option value="false" selected="@(!filter.SortDescending)">Ascending</option>
+                    </select>
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Reset Filters</a>
+                    <button type="submit" class="btn btn-sm btn-primary px-3">Apply Filters</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Requests Data Table -->
+<div class="card portal-card border-0 mb-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-portal table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Team</th>
+                        <th>Requester</th>
+                        <th>Assignee</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>SLA Deadline</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Items.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="11" class="text-center py-5 text-muted">
+                                <i class="bi bi-funnel fs-2 text-secondary d-block mb-2"></i>
+                                No service requests found matching the current search filters or authorization scope.
+                            </td>
+                        </tr>
+                    }
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr class="@(item.IsSlaBreached ? "table-danger" : item.SlaHealth == SlaHealthStatus.Approaching ? "table-warning" : "")">
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="fw-bold text-decoration-none">
+                                    @item.ReferenceNumber
+                                </a>
+                            </td>
+                            <td>
+                                <div class="fw-medium text-dark text-truncate" style="max-width: 240px;" title="@item.Title">
+                                    @item.Title
+                                </div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@item.CategoryName</span></td>
+                            <td>@item.SupportTeamName</td>
+                            <td>@item.RequesterName</td>
+                            <td>
+                                @if (string.IsNullOrEmpty(item.AssigneeName))
+                                {
+                                    <span class="text-muted fst-italic">Unassigned</span>
+                                }
+                                else
+                                {
+                                    <span><i class="bi bi-person text-secondary"></i> @item.AssigneeName</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.Priority == RequestPriority.Critical)
+                                {
+                                    <span class="badge bg-danger">Critical</span>
+                                }
+                                else if (item.Priority == RequestPriority.High)
+                                {
+                                    <span class="badge bg-warning text-dark">High</span>
+                                }
+                                else if (item.Priority == RequestPriority.Medium)
+                                {
+                                    <span class="badge bg-info text-dark">Medium</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Low</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge-status badge-status-@item.Status.ToString().ToLower()">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.SlaHealth == SlaHealthStatus.Breached)
+                                {
+                                    <span class="badge badge-sla-breached"><i class="bi bi-exclamation-triangle-fill"></i> Breached</span>
+                                }
+                                else if (item.SlaHealth == SlaHealthStatus.Approaching)
+                                {
+                                    <span class="badge badge-sla-approaching"><i class="bi bi-clock-history"></i> Due Soon</span>
+                                }
+                                else if (item.Status == RequestStatus.Resolved || item.Status == RequestStatus.Closed)
+                                {
+                                    <span class="badge bg-light text-muted border">Completed</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-sla-healthy">@item.ResolutionDueAt.ToString("MMM dd, HH:mm")</span>
+                                }
+                            </td>
+                            <td class="small text-muted">@item.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination Footer -->
+    @if (Model.TotalPages > 1)
+    {
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center py-2 px-3">
+            <div class="small text-muted">
+                Showing @((Model.PageNumber - 1) * Model.PageSize + 1) to @(Math.Min(Model.PageNumber * Model.PageSize, Model.TotalCount)) of @Model.TotalCount requests
+            </div>
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item @(!Model.HasPreviousPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-pageNumber="@(Model.PageNumber - 1)"
+                       asp-route-searchTerm="@filter.SearchTerm"
+                       asp-route-status="@filter.Status"
+                       asp-route-priority="@filter.Priority"
+                       asp-route-categoryId="@filter.CategoryId"
+                       asp-route-slaState="@filter.SlaState"
+                       asp-route-sortBy="@filter.SortBy"
+                       asp-route-sortDescending="@filter.SortDescending">Previous</a>
+                </li>
+                @for (int p = 1; p <= Model.TotalPages; p++)
+                {
+                    <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                        <a class="page-link" asp-action="Index"
+                           asp-route-pageNumber="@p"
+                           asp-route-searchTerm="@filter.SearchTerm"
+                           asp-route-status="@filter.Status"
+                           asp-route-priority="@filter.Priority"
+                           asp-route-categoryId="@filter.CategoryId"
+                           asp-route-slaState="@filter.SlaState"
+                           asp-route-sortBy="@filter.SortBy"
+                           asp-route-sortDescending="@filter.SortDescending">@p</a>
+                    </li>
+                }
+                <li class="page-item @(!Model.HasNextPage ? "disabled" : "")">
+                    <a class="page-link" asp-action="Index"
+                       asp-route-pageNumber="@(Model.PageNumber + 1)"
+                       asp-route-searchTerm="@filter.SearchTerm"
+                       asp-route-status="@filter.Status"
+                       asp-route-priority="@filter.Priority"
+                       asp-route-categoryId="@filter.CategoryId"
+                       asp-route-slaState="@filter.SlaState"
+                       asp-route-sortBy="@filter.SortBy"
+                       asp-route-sortDescending="@filter.SortDescending">Next</a>
+                </li>
+            </ul>
+        </div>
+    }
+</div>
